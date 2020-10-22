@@ -27,9 +27,9 @@
 
 # About Unicorn Framework
 
-    Unicorn Framework is a Linux post-exploitation framework that 
-    exploits Linux TCP vulnerability to get shell-like connection 
-    with a lot of function such as download, upload and etc.
+    Unicorn Framework is a Linux post-exploitation framework that exploits Linux TCP 
+    vulnerability to get interactive shell connection with a lot of features such 
+    as downloading files, uploading files, getting system information and etc.
 
 ***
 
