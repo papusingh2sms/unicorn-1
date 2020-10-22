@@ -1,8 +1,5 @@
 import socket
-import colorama
 import sys
-
-colorama.init()
 
 I = '\033[1;77m[i] \033[0m'
 Q = '\033[1;77m[?] \033[0m'
