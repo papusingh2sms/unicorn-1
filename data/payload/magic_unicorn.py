@@ -6,11 +6,7 @@ import os
 import sys
 import platform
 import getpass
-import colorama
-from colorama import Fore, Style
 from time import sleep
-
-colorama.init()
 
 I = '\033[1;77m[i] \033[0m'
 Q = '\033[1;77m[?] \033[0m'
