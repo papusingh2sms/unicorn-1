@@ -137,7 +137,7 @@ def main():
             if lhost == "" or lport == "":
                 print(E+"Failed to start listener!")
             else:
-                os.system("core/unicat.py "+lhost+" "+lport)
+                os.system("python3 core/unicat.py "+lhost+" "+lport)
         else:
             print(E+"Unrecognized command!")
         try:
