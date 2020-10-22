@@ -77,7 +77,7 @@ while True:
     client.send(command)
     data = client.recv(1024).decode("utf-8")
     if data == "exit":
-        print(G+"Clening up...")
+        print(G+"Cleaning up...")
         break
     print(data)
 client.close()
