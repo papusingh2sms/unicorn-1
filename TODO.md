@@ -1,0 +1,5 @@
+- [x] Unicorn installer/uninstaller
+- [x] Unicorn launcher
+- [ ] File download/upload
+- [ ] Remote commands execution
+- [x] Stable interface

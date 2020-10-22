@@ -1,0 +1,37 @@
+#!/bin/bash
+
+printf '\033]2;Unicorn Framework\a'
+
+G="\033[1;34m[*] \033[0m"
+S="\033[1;32m[+] \033[0m"
+E="\033[1;31m[-] \033[0m"
+
+if [[ -d ~/unicorn ]]
+then
+cd ~/unicorn
+chmod +x unicorn
+./unicorn
+else
+{
+ASESR="$(ping -c 1 -q www.google.com >&/dev/null; echo $?)"
+} &> /dev/null
+if [[ "$ASESR" = 0 ]]
+then
+cd ~
+{
+git clone https://github.com/EntySec/unicorn.git
+cd $OLDPWD
+cd ~/unicorn
+} &> /dev/null
+if [[ ! -d ~/unicorn ]]
+then
+   echo -e ""$E"Execution failed!"
+   exit
+fi
+chmod +x unicorn
+./unicorn
+else
+echo -e ""$E"Execution failed!"
+exit
+fi
+fi
