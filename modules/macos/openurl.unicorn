@@ -1,0 +1,2 @@
+$command = "openurl $1"
+$usage = "openurl <url>"
