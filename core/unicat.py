@@ -61,26 +61,29 @@ while True:
     command = input(input_header.decode()).encode()
 
     if command.decode("utf-8").split(" ")[0] == "download":
-        file_name = command.decode("utf-8").split(" ")[2]
-        client.send(command)
-        with open(file_name, "wb") as f:
-            read_data = client.recv(1024)
-            while read_data:
-                f.write(read_data)
+        if len(command.decode("utf-8").split(" ")) < 3:
+            pass
+        else:
+            file_name = command.decode("utf-8").split(" ")[2]
+            client.send(command)
+            with open(file_name, "wb") as f:
                 read_data = client.recv(1024)
-                if read_data == b"DONE":
-                    break
+                while read_data:
+                    f.write(read_data)
+                    read_data = client.recv(1024)
+                    if read_data == b"DONE":
+                        break
     
     if command == b"":
-        command = b""
-    
+        command = b" "
+
     client.send(command)
     data = client.recv(1024).decode("utf-8")
     if data == "exit":
         print(G+"Cleaning up...")
         break
-       
-    if command.decode("utf-8").split(" ")[0] != "download":
+
+    if data != "none" and != "download":
         print(data)
     
 client.close()
