@@ -70,7 +70,10 @@ while True:
                 read_data = client.recv(1024)
                 if read_data == b"DONE":
                     break
-
+    
+    if command == b"":
+        command = b""
+    
     client.send(command)
     data = client.recv(1024).decode("utf-8")
     if data == "exit":
