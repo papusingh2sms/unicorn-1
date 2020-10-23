@@ -61,7 +61,7 @@ while True:
     command = input(input_header.decode()).encode()
 
     if command.decode("utf-8").split(" ")[0] == "download":
-        file_name = command.decode("utf-8").split(" ")[1][::-1]
+        file_name = command.decode("utf-8").split(" ")[2]
         client.send(command)
         with open(file_name, "wb") as f:
             read_data = client.recv(1024)
@@ -76,6 +76,8 @@ while True:
     if data == "exit":
         print(G+"Cleaning up...")
         break
+        
     print(data)
+    
 client.close()
 sock.close()
