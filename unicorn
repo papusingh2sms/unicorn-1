@@ -86,7 +86,7 @@ G = '\033[1;34m[*] \033[0m'
 
 def banner():
     os.system("clear")
-    os.system("lolcat banner/banner.txt")
+    os.system("cat banner/banner.txt")
     print("")
     print("Unicorn Framework v1.0")
     print("----------------------")
