@@ -76,8 +76,9 @@ while True:
     if data == "exit":
         print(G+"Cleaning up...")
         break
-        
-    print(data)
+       
+    if command.decode("utf-8").split(" ")[0] != "download":
+        print(data)
     
 client.close()
 sock.close()
