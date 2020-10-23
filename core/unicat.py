@@ -83,7 +83,7 @@ while True:
         print(G+"Cleaning up...")
         break
 
-    if data != "none" and != "download":
+    if data != "none" and data != "download":
         print(data)
     
 client.close()
