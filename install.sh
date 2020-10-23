@@ -86,11 +86,6 @@ exit
 fi
 
 {
-python3 -m pip install setuptools
-python3 -m pip install -r requirements.txt
-} &> /dev/null
-
-{
 cd bin
 cp unicorn /usr/local/bin
 chmod +x /usr/local/bin/unicorn
