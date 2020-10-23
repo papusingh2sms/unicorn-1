@@ -66,6 +66,7 @@ Processor Architecture: {platform.processor()}
                         sock.send(file_data)
                         file_data = f.read(1024)
                     sock.send(b"DONE")
+                    f.close()
 
         elif cmd == "exit":
             sock.send(b"exit")
