@@ -1,6 +1,7 @@
 
     Command        Description
     -------        -----------
+    load           Load custom payload on device.
     openurl        Open URL on device.
     screenshot     Take screenshot.
     shell          Execute remote command.
