@@ -92,7 +92,6 @@ def download(command):
                 return
             wf.write(data)
         wf.close()
-        unicorn.send(str(os.getcwd()+os.sep+output_filename).encode("UTF-8"))
 
 def openurl(command):
     url = "".join(command.split("openurl")).strip()

