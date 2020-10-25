@@ -1,0 +1,4 @@
+
+    Command        Description
+    -------        -----------
+    rickroll       Start Rick Astley.

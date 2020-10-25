@@ -1,0 +1,7 @@
+
+    Command        Description
+    -------        -----------
+    openurl        Open URL on device.
+    screenshot     Take screenshot.
+    shell          Execute remote command.
+    upload         Upload local file.
