@@ -2,6 +2,7 @@
     Command        Description
     -------        -----------
     load           Load custom payload on device.
+    mic            Listen microphone sound.
     openurl        Open URL on device.
     screenshot     Take screenshot.
     shell          Execute remote command.
