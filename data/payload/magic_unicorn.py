@@ -63,7 +63,7 @@ def upload(command):
         else:
             unicorn.send("true".encode("UTF-8"))
             with open(output_filename, "rb") as wf:
-                for data in iter(lambda: wf.read(4100), b""):
+                for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
                     try:
                         unicorn.send(data)
                     except(KeyboardInterrupt,EOFError):
