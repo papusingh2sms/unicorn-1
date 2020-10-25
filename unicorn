@@ -10,6 +10,7 @@ import sys
 import subprocess
 import readline
 import time
+import socket
 
 from os import environ
 
@@ -93,8 +94,8 @@ def banner():
     print("")
 
 def main():
-    lport = ""
-    lhost = ""
+    lport = 4444
+    lhost = socket.gethostbyaddr(socket.gethostname())[0]
     try:
         ui = input('\033[4municorn\033[0m> ').strip(" ")
     except:
