@@ -15,7 +15,6 @@ import subprocess
 import os
 import sys
 import platform
-import platform
 import getpass
 
 from time import sleep
