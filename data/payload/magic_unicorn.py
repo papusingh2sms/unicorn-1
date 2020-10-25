@@ -30,6 +30,9 @@ if len(sys.argv) != 3:
 RHOST = sys.argv[1]
 RPORT = int(sys.argv[2])
 
+def check_root():
+    return os.getuid == 0
+
 class handler:
     def __init__(self,sock):
         self.sock = sock
