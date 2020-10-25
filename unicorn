@@ -105,7 +105,7 @@ def banner():
     print("")
 
 def main():
-    lport = 4444
+    lport = "4444"
     lhost = getip()
     try:
         ui = input('\033[4municorn\033[0m> ').strip(" ")
