@@ -35,7 +35,7 @@
 
 # Getting started
 
-# Unicorn installation
+## Unicorn installation
 
 > cd unicorn
 
@@ -43,7 +43,7 @@
 
 > ./install.sh
 
-# Unicorn uninstallation
+## Unicorn uninstallation
 
 > cd unicorn
 
