@@ -18,6 +18,7 @@ import sys
 import os
 import pyaudio
 
+from time import sleep
 from datetime import datetime
 
 # List of commands without required output
@@ -228,6 +229,7 @@ def shell():
                     unicorn.send(command.encode("UTF-8"))
                     status = unicorn.recv()
                     if status == b"success":
+                        sleep(5) # timeout
                         print(S+"Done saying message!")
                     else:
                         print(E+"Failed to say message!")
