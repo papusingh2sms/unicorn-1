@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# Most of code taken from stackoverflow because I am new at sockets
-
 I = '\033[1;77m[i] \033[0m'
 Q = '\033[1;77m[?] \033[0m'
 S = '\033[1;32m[+] \033[0m'
