@@ -20,7 +20,7 @@ import pyaudio
 
 from datetime import datetime
 
-# List of commands that not requires output
+# List of commands without required output
 black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic', 'download', 'upload', 'load', 'say']
 
 if len(sys.argv) != 3:
