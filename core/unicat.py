@@ -302,23 +302,17 @@ def server(LHOST, LPORT, handler=handler):
     
     print(G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
     try:
-        sock = socket.socket()
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(('0.0.0.0', LPORT))
-        sock.listen(1)
+        s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((LHOST, LPORT))
+        s.listen(1)
     except:
         print(E + "Failed to bind to " + LHOST + ":" + str(LPORT) + "!")
         try: 
-            sock.close()
+            s.close()
         except:
             pass
         sys.exit()
-    sock.close()
-    
-    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((LHOST, LPORT))
-    s.listen(1)
 
     try:
         print(G + "Listening on port " + str(LPORT) + "...")
