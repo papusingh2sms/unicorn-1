@@ -336,7 +336,7 @@ def server(LHOST, LPORT, handler=handler):
             target_system = "Linux"
         elif device_os == "Darwin" and device_arch == "i386":
             target_system = "macOS"
-        elif device_os == "Darwin" and device_arch in ["arm64", "armv7s", "arm"]
+        elif device_os == "Darwin" and device_arch in ["arm64", "armv7s", "arm"]:
             target_system = "iOS"
         else:
             target_system = "Unknown"
