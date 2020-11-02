@@ -1,7 +1,5 @@
 # Unicorn Framework
 
-## `⚠️ Under construction, do not use it now! ⚠️`
-
 <h3 align="center"><img src="https://user-images.githubusercontent.com/54115104/96840541-43f67b00-1453-11eb-9579-97ec826582f9.png" alt="logo" height="250px"></h3>
 
 <p align="center">
