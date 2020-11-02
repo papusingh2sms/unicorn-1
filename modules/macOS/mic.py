@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import pyaudio
+
 from core.badges import badges
 from core.transfer import transfer
 
