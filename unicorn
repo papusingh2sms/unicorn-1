@@ -13,6 +13,11 @@ import time
 import socket
 
 from os import environ
+from core.badges import badges
+
+badges = badges()
+
+from core.unicat import server
 
 def getip():
     try:
@@ -139,19 +144,20 @@ def main():
             else:
                 if ui[1].lower() == "lhost":
                     lhost = ui[2]
-                    print(I + "LHOST ==> " + ui[2])
+                    print(badges.I + "LHOST ==> " + ui[2])
                 elif ui[1].lower() == "lport":
                     lport = ui[2]
-                    print(I + "LPORT ==> " + ui[2])
+                    print(badges.I + "LPORT ==> " + ui[2])
                 else:
-                    print(E+"Option is not found!")
+                    print(badges.E +"Option is not found!")
         elif ui[0] == "run":
             if lhost == "" or lport == "":
-                print(E+"Failed to start listener!")
+                print(badges.E +"Failed to start listener!")
             else:
-                os.system("python3 core/unicat.py "+lhost+" "+lport)
+                #os.system("python3 core/unicat.py "+lhost+" "+lport)
+                server(lhost, int(lport))
         else:
-            print(E+"Unrecognized command!")
+            print(badges.E +"Unrecognized command!")
         try:
             ui = input('\033[4municorn\033[0m> ').strip(" ")
         except:
