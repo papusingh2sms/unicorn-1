@@ -8,3 +8,5 @@ class badges:
         self.G = '\033[1;34m[*] \033[0m'
         self.GREEN = '\033[0;33m'
         self.RESET = '\033[0m'
+        self.LINED = '\033[3;1;77m'
+        self.RESET = '\033[0m'

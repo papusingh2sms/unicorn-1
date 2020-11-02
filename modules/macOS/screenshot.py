@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "screenshot"
         self.description = "Take screenshot."
         self.usage = "Usage: screenshot <output_path>"
+        self.type = "managing"
         self.args = 2
 
     def run(self, cmd_data):

@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "upload"
         self.description = "Upload local file."
         self.usage = "Usage: download <input_file> <output_path>"
+        self.type = "managing"
         self.args = 3
 
     def run(self, cmd_data):

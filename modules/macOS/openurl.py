@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "openurl"
         self.description = "Open URL."
         self.usage = "Usage: openurl <url>"
+        self.type = "managing"
         self.args = 2
 
     def run(self, cmd_data):
@@ -22,4 +23,4 @@ class UnicornModule:
         sended_url.append("openurl")
         sended_url.append(cmd_data)
 
-        self.unicorn.send(list(sended_url).encode("UTF-8"))
+        self.unicorn.send(str(sended_url).encode("UTF-8"))

@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "download"
         self.description = "Download remote file."
         self.usage = "Usage: download <input_file> <output_path>"
+        self.type = "stealing"
         self.args = 3
 
     def run(self, cmd_data):

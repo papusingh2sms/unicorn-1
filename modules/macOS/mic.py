@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "mic"
         self.description = "Listen microphone sound."
         self.usage = "Usage: mic"
+        self.type = "managing"
         self.args = 1
 
     def run(self, cmd_data):

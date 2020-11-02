@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "say"
         self.description = "Say message."
         self.usage = "Usage: say <message>"
+        self.type = "trolling"
         self.args = 2
 
     def run(self, cmd_data):

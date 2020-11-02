@@ -12,6 +12,7 @@ class UnicornModule:
         self.name = "load"
         self.description = "Load custom payload."
         self.usage = "Usage: load <input_file> [argv]"
+        self.type = "managing"
         self.args = 2
 
     def run(self, cmd_data):
@@ -32,6 +33,6 @@ class UnicornModule:
         sended_command.append(instructions)
 
         self.send(str(sended_command).encode("UTF-8"))
-        payload_output = self.unicorn.recv()
+        payload_output = self.unicorn.recv().strip()
         print(payload_output.decode("UTF-8", "ignore"))
         print(self.badges.S + "Payload executed!")
