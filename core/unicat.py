@@ -4,8 +4,6 @@ import socket
 import struct
 import sys
 import os
-import pyaudio
-import importlib
 
 from time import sleep
 from datetime import datetime
