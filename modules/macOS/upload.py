@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.transfer import transfer
+from core.sender import sender
 
 class UnicornModule:
     def __init__(self, unicorn_handler):
-        self.unicorn = unicorn_handler
-        self.transfer = transfer(self.unicorn)
+        self.sender = sender(unicorn_handler)
         self.badges = badges()
 
         self.name = "upload"
@@ -16,6 +15,4 @@ class UnicornModule:
         self.args = 3
 
     def run(self, cmd_data):
-        input_file = cmd_data.split(" ")[0]
-        output_file = cmd_data.split(" ")[1]
-        self.transfer.upload(input_file, output_file)
+        self.sender.upload(cmd_data)

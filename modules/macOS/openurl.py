@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.transfer import transfer
+from core.sender import sender
 
 class UnicornModule:
     def __init__(self, unicorn_handler):
-        self.unicorn = unicorn_handler
-        self.transfer = transfer(self.unicorn)
+        self.sender = sender(unicorn_handler)
         self.badges = badges()
 
         self.name = "openurl"
@@ -19,8 +18,4 @@ class UnicornModule:
         if not cmd_data.startswith(("http://", "https://")):
             cmd_data = "http://" + cmd_data
 
-        sended_url = []
-        sended_url.append("openurl")
-        sended_url.append(cmd_data)
-
-        self.unicorn.send(str(sended_url).encode("UTF-8"))
+        self.sender.send_command(self.name, cmd_data, False)

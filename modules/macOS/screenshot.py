@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.transfer import transfer
+from core.sender import sender
 
 class UnicornModule:
     def __init__(self, unicorn_handler):
-        self.unicorn = unicorn_handler
-        self.transfer = transfer(self.unicorn)
+        self.sender = sender(unicorn_handler)
         self.badges = badges()
 
         self.name = "screenshot"
@@ -18,11 +17,7 @@ class UnicornModule:
     def run(self, cmd_data):
         print(self.badges.G + "Taking screenshot...")
         
-        sended_command = []
-        sended_command.append("screenshot")
-        
-        self.unicorn.send(str(sended_command).encode("UTF-8"))
-        image = self.unicorn.recv()
+        image = self.sender.send_command(self.name, cmd_data, True, False)
         f = open(cmd_data, "wb")
         print(self.badges.G + "Saving to " + cmd_data + "...")
         f.write(image)

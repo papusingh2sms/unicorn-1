@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.transfer import transfer
+from core.sender import sender
 
 class UnicornModule:
     def __init__(self, unicorn_handler):
-        self.unicorn = unicorn_handler
-        self.transfer = transfer(self.unicorn)
+        self.sender = sender(unicorn_handler)
         self.badges = badges()
 
         self.name = "shell"
@@ -16,9 +15,4 @@ class UnicornModule:
         self.args = 2
 
     def run(self, cmd_data):
-        sended_command = []
-        sended_command.append("shell")
-        sended_command.append(cmd_data)
-
-        self.unicorn.send(str(sended_command).encode("UTF-8"))
-        print(self.unicorn.recv().strip().decode("UTF-8", "ignore"))
+        print(self.sender.send_command(self.name, cmd_data))
