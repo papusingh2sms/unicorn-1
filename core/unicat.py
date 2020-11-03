@@ -10,10 +10,12 @@ from datetime import datetime
 
 from core.handler import handler
 from core.badges import badges
+from core.helper import helper
 
 class UniCat:
     def __init__(self):
         self.badges = badges()
+        self.helper = helper()
 
     def get_module(self, mu, name, folderpath):
         folderpath_list = folderpath.split(".")
@@ -68,7 +70,7 @@ class UniCat:
             sys.exit()
 
     def help(self):
-        pass
+        self.helper.show_commands(universal_commands, target_commands)
 
     def get_prompt_information(self):
         username = ['username']
@@ -155,9 +157,9 @@ class UniCat:
             c, a = s.accept()
             print(self.badges.G + "Connecting to " + a[0] + "...")
 
-            c.send("uname -p\n".encode())
+            c.send((self.helper.get_arch).encode())
             device_arch = c.recv(128).decode().strip()
-            c.send("uname -s\n".encode())
+            c.send((self.helper.get_system).encode())
             device_os = c.recv(128).decode().strip()
         
             if device_os == "Linux":
