@@ -119,7 +119,7 @@ class magic_unicorn:
         browser.open(url)
 
     def execute_osascript(self, script):
-        script = "osascript -e " + script
+        script = "osascript -e '" + script + "'"
         self.unicorn.send(bytes(self.execute(script).strip()))
         
     def listen_audio(self):
