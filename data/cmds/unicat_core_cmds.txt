@@ -1,6 +1,0 @@
-
-    Command        Description
-    -------        -----------
-    clear          Clear terminal window.
-    exit           Exit UniCat command handler.
-    help           Show available commands.
