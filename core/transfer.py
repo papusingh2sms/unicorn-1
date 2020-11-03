@@ -29,7 +29,6 @@ class transfer:
             self.unicorn.send("success".encode("UTF-8"))
             print(self.badges.G + "Saving to " + output_file + "...")
             print(self.badges.S + "Saved to " + output_file + "!")
-            print(down)
 
     def download(self, input_file, output_file):
         sended_download = []
