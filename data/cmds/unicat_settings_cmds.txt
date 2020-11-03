@@ -1,6 +1,0 @@
-
-    Command        Description
-    -------        -----------
-    hostname	   Show device hostname.
-    sysinfo        Show system information.
-    username       Show device username.
