@@ -13,7 +13,7 @@ class transfer:
             sended_upload.append("upload")
             sended_upload.append(output_file)
 
-            self.unicorn.send(sended_upload.encode("UTF-8"))
+            self.unicorn.send(str(sended_upload).encode("UTF-8"))
             print(self.badges.G + "Uploading {}...".format(input_file))
             with open(input_file, "rb") as wf:
                 for data in iter(lambda: wf.read(4100), b""):
@@ -34,7 +34,7 @@ class transfer:
         sended_download.append("download")
         sended_download.append(input_file)
 
-        self.unicorn.send(sended_download.encode("UTF-8"))
+        self.unicorn.send(str(sended_download).encode("UTF-8"))
         down = self.unicorn.recv().decode("UTF-8", "ignore")
         if down == "true":
             print(self.badges.G + "Downloading {}...".format(output_file))
