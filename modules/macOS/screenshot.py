@@ -17,7 +17,11 @@ class UnicornModule:
 
     def run(self, cmd_data):
         print(self.badges.G + "Taking screenshot...")
-        self.unicorn.send("screenshot".encode("UTF-8"))
+        
+        sended_command = []
+        sended_command.append("screenshot")
+        
+        self.unicorn.send(str(sended_command).encode("UTF-8"))
         image = self.unicorn.recv()
         f = open(cmd_data, "wb")
         print(self.badges.G + "Saving to " + cmd_data + "...")
