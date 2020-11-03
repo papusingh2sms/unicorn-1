@@ -1,4 +1,0 @@
-
-    Command        Description
-    -------        -----------
-    download       Download remote file.
