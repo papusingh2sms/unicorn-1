@@ -23,7 +23,7 @@
  </a>
 </p>
 
-<h3 align="center"><img src="https://user-images.githubusercontent.com/54115104/97954870-bf422000-1db5-11eb-9af1-f698dab990c9.png" alt="logo" height="250px"></h3>
+<h3 align="center"><img src="https://user-images.githubusercontent.com/54115104/97954870-bf422000-1db5-11eb-9af1-f698dab990c9.png" alt="logo" height="500px"></h3>
 
 ***
 
