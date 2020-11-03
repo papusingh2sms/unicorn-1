@@ -31,7 +31,7 @@ class UnicornModule:
             print(self.badges.G + "Listening...")
             print(self.badges.I + "Press Ctrl-C to stop.")
             while True:
-                self.unicorn.send("continue".encode("UTF-8"))
+                self.sender.send_request("continue", False)
                 try:
                     data = self.unicorn.recvall(4096)
                     stream.write(data)
