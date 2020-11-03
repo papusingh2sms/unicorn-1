@@ -43,8 +43,9 @@ class UniCat:
         return modules
 
     def load_modules(self):
-        global commands
-        commands = self.import_modules("modules/" + target_system)
+        global universal_commands, target_commands
+        universal_commands = self.import_modules("modules/universal")
+        target_commands = self.import_modules("modules/" + target_system)
 
     def craft_payload(self, LHOST, LPORT, target_system):
         if target_system in ["Linux", "macOS", "iOS"]:
@@ -106,13 +107,19 @@ class UniCat:
                 elif command[0] == "clear":
                     os.system("clear")
                 else:
-                    if command[0] in commands.keys():
-                        if len(command) < int(commands[command[0]].args):
-                            print(commands[command[0]].usage)
+                    if command[0] in universal_commands.keys():
+                        if len(command) < int(universal_commands[command[0]].args):
+                            print(universal_commands[command[0]].usage)
                         else:
-                            commands[command[0]].run(arguments)
+                            universal_commands[command[0]].run(arguments)
                     else:
-                        print(self.badges.E + "Unrecognized command!")
+                        if command[0] in target_commands.keys():
+                            if len(command) < int(target_commands[command[0]].args):
+                                print(target_commands[command[0]].usage)
+                            else:
+                                target_commands[command[0]].run(arguments)
+                        else:
+                            print(self.badges.E + "Unrecognized command!")
             except (KeyboardInterrupt, EOFError):
                 print("")
             except socket.error:
