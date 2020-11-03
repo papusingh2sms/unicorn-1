@@ -108,5 +108,6 @@ class helper:
         msgs = ['Simon’s StupidBot released at 2019?', 'Unicorn is not just a reverse shell.', 'Simon Chaykin liar?',
                 'Pythons attack!', 'Unicorns attack!', 'Magic unicorns attack!', 'I can’t trust you, Mr. Robot',
                 'NASA hacked!', 'Do not check Ivan’s code', 'bash -c bash -c bash', 'Simon Chaykin or Semuon Chaykin?',
-                'Thank you 2020Vis13079846!', 'Sorry, Felix is not me!', 'rm -rf / --no-preserve-root', 'Alena L0v3']
+                'Thank you 2020Vis13079846!', 'Sorry, Felix is not me!', 'rm -rf / --no-preserve-root', '<3 Alena L0v3 <3', 
+                'xor simon, simon; push simon // this will not work :(', 'Do not use Objective-C for this! This is how EggShell created.']
         return self.badges.LINED + msgs[random.randint(0, len(msgs) - 1)] + self.badges.RESET
