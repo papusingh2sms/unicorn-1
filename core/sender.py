@@ -12,5 +12,5 @@ class sender:
         template.append(command)
         template.append(cmd_data)
         
-        self.unicorn.send(template)
+        self.unicorn.send(str(template).encode("UTF-8"))
         return self.unicorn.recv().split().decode("UTF-8", "ignore")
