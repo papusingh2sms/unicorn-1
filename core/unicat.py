@@ -88,7 +88,7 @@ class UniCat:
                     self.help()
                 elif command[0] == "exit":
                     print(self.badges.G + "Cleaning up...")
-                    unicorn.send_command("exit")
+                    unicorn.send_command("exit", None, False)
                     c.close()
                     s.close()
                     sys.exit()
