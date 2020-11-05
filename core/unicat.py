@@ -11,6 +11,7 @@ from datetime import datetime
 from core.handler import handler
 from core.badges import badges
 from core.helper import helper
+from core.sender import sender
 
 class UniCat:
     def __init__(self):
@@ -39,7 +40,7 @@ class UniCat:
                 mt = __import__(md)
             
                 m = self.get_module(mt, mod[:-3], md)
-                m = m.UnicornModule(unicorn)
+                m = m.UnicornModule(sender)
             
                 modules[m.name] = m
         return modules
@@ -72,19 +73,11 @@ class UniCat:
     def help(self):
         self.helper.show_commands(universal_commands, target_commands)
 
-    def get_prompt_information(self):
-        username = ['username']
-        unicorn.send(str(username).encode("UTF-8"))
-        username = unicorn.recv()
-        hostname = ['hostname']
-        unicorn.send(str(hostname).encode("UTF-8"))
-        hostname = unicorn.recv()
-        return (username.decode("UTF-8", "ignore"), hostname.decode("UTF-8", "ignore"))
-
     def shell(self):
+        username = sender.send_command("username")
+        hostname = sender.send_command("hostname")
         while True:
             try:
-                username, hostname = self.get_prompt_information()
                 command = str(input("({}{}@{}{})> ".format(self.badges.GREEN, username, hostname, self.badges.RESET)))
                 while not command.strip():
                     command = str(input("({}{}@{}{})> ".format(self.badges.GREEN, username, hostname, self.badges.RESET)))
@@ -136,7 +129,7 @@ class UniCat:
                 print(self.badges.E +"An error occurred: "+str(e)+"!")
 
     def server(self, LHOST, LPORT, handler=handler):
-        global s, a, c, target_system, unicorn
+        global s, a, c, sender, target_system
     
         print(self.badges.G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
         try:
@@ -180,7 +173,7 @@ class UniCat:
             print(self.badges.G + "Establishing connection...")
             c, a = s.accept()
 
-            unicorn = handler(c)
+            sender = sender(handler(c))
             self.load_modules()
             self.shell()
         except (KeyboardInterrupt, EOFError):
