@@ -21,7 +21,4 @@ class UnicornModule:
         print(self.badges.I + "Press Ctrl-C to stop.")
         while True:
             char = self.keyboard.get_char()
-            if char != chr(03):
-                self.unicorn.send_command("osascript", self.keyboard.send_char(char), False)
-            else:
-                return
+            self.unicorn.send_command("osascript", self.keyboard.send_char(char), False)
