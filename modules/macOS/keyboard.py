@@ -3,7 +3,7 @@
 from core.badges import badges
 from core.keyboard import keyboard
 
-class MagicUnicorn:
+class UnicornModule:
     def __init__(self, unicorn):
         self.unicorn = unicorn
         self.badges = badges()
