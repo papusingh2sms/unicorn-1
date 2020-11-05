@@ -7,8 +7,8 @@ import os
 import sys
 import platform
 import getpass
+import pathlib
 
-from time import sleep
 import webbrowser as browser
 from PIL import ImageGrab
 
@@ -178,6 +178,7 @@ class magic_unicorn:
 
     def command_chdir(self, cmd_data):
         main_directory = os.getcwd()
+        home_directory = str(pathlib.Path.home())
         temp_directory = ""
         if cmd_data == "-":
             if not temp_directory:
@@ -191,6 +192,10 @@ class magic_unicorn:
             temp_directory = os.getcwd()
             os.chdir(main_directory)
             self.handler.send((self.badges.I + "Changed to directory {}.".format(main_directory)).encode("UTF-8"))
+        elif cmd_data == "~":
+            temp_directory = os.getcwd()
+            os.chdir(home_directory)
+            self.handler.send((self.badges.I + "Changed to directory {}.".format(home_directory)).encode("UTF-8"))
         else:
             if not os.path.isdir(cmd_data):
                 self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
