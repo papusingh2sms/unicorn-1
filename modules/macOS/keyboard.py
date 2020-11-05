@@ -20,8 +20,8 @@ class MagicUnicorn:
         print(self.badges.G + "Connecting to keyboard...")
         print(self.badges.I + "Press Ctrl-C to stop.")
         while True:
-            key = self.keyboard.get_chr()
-            if key != chr(03):
-                self.unicorn.send_command("osascript", self.keyboard.send_chr(key), False)
+            char = self.keyboard.get_char()
+            if char != chr(03):
+                self.unicorn.send_command("osascript", self.keyboard.send_char(char), False)
             else:
                 return
