@@ -11,11 +11,12 @@ class unicorn:
 
     def send_request(self, request, ask_for_response=True, decode=True):
         self.handler.send(request.encode("UTF-8"))
+        response = self.handler.recv()
         if ask_for_response:
             if decode:
-                return self.handler.recv().strip().decode("UTF-8", "ignore")
+                return response.strip().decode("UTF-8", "ignore")
             else:
-                return self.handler.recv()
+                return response
 
     def send_command(self, command, cmd_data=None, ask_for_response=True, decode=True):
         template = []
@@ -26,11 +27,12 @@ class unicorn:
 
         self.handler.send(str(template).encode("UTF-8"))
 
+        response = self.handler.recv()
         if ask_for_response:
             if decode:
-                return self.handler.recv().strip().decode("UTF-8", "ignore")
+                return response.strip().decode("UTF-8", "ignore")
             else:
-                return self.handler.recv()
+                return response
 
     def download(self, cmd_data):
         input_file = cmd_data.split(" ")[0]
