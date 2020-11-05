@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.sender import sender
 
 class UnicornModule:
-    def __init__(self, unicorn_handler):
-        self.sender = sender(unicorn_handler)
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "say"
@@ -15,7 +14,7 @@ class UnicornModule:
         self.args = 2
 
     def run(self, cmd_data):
-        if self.sender.send_command(self.name, cmd_data) == "success":
+        if self.unicorn.send_command(self.name, cmd_data) == "success":
             print(self.badges.S + "Done saying message!")
         else:
             print(self.badges.E + "Failed to say message!")

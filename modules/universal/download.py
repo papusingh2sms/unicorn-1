@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.sender import sender
 
 class UnicornModule:
-    def __init__(self, unicorn_handler):
-        self.sender = sender(unicorn_handler)
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "download"
@@ -15,4 +14,4 @@ class UnicornModule:
         self.args = 3
 
     def run(self, cmd_data):
-        self.sender.download(cmd_data)
+        self.unicorn.download(cmd_data)

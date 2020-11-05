@@ -112,11 +112,22 @@ def main():
             os.system("cat data/cmds/core_cmds.txt")
             print("")
         elif ui[0] == "options":
-            if lhost == "":
-                lhost = "none"
-            if lport == "":
-                lport = "none"
-            os.system("ruby data/options/options.rb "+lhost+" "+lport)
+            if len(lhost) >= 12 or len(lport) >= 12:
+                if len(lhost) > len(lport):
+                    bigger = len(lhost) - 3
+                else:
+                    bigger = len(lport) - 3
+            else:
+                bigger = 8
+            print("")
+            print("Unicorn Options")
+            print("===============")
+            print("")
+            print("    Option        Value" + " " * bigger + "Description")
+            print("    ------        -----" + " " * bigger + "-----------")
+            print("    LHOST         " + lhost + " " * (5 - len(lhost) + bigger) + "Local host.")
+            print("    LPORT         " + lport + " " * (5 - len(lport) + bigger) + "Local port.")
+            print("")
         elif ui[0] == "set":
             if len(ui) < 3:
                 print("Usage: set <option> <value>")
