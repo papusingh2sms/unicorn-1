@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "rickroll"
@@ -14,5 +14,5 @@ class UnicornModule:
         self.args = 1
 
     def run(self, cmd_data):
-        self.sender.send_command("openurl", "https://www.youtube.com/watch?v=oHg5SJYRHA0", False)
+        self.unicorn.send_command("openurl", "https://www.youtube.com/watch?v=oHg5SJYRHA0", False)
         print(self.badges.S + "Target has been rickrolled!")

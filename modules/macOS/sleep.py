@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
         
         self.name = "sleep"
@@ -15,4 +15,4 @@ class UnicornModule:
         
     def run(self, cmd_data):
         payload = "tell application \"Finder\" to sleep"
-        self.sender.send_command("osascript", payload, False)
+        self.unicorn.send_command("osascript", payload, False)

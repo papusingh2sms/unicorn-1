@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
         
         self.name = "alert"
@@ -32,4 +32,4 @@ class UnicornModule:
         end tell        
         """
         
-        self.sender.send("osascript", payload, False)
+        self.unicorn.send("osascript", payload, False)

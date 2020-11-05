@@ -11,7 +11,7 @@ from datetime import datetime
 from core.handler import handler
 from core.badges import badges
 from core.helper import helper
-from core.sender import sender
+from core.unicorn import unicorn
 
 class UniCat:
     def __init__(self):
@@ -40,7 +40,7 @@ class UniCat:
                 mt = __import__(md)
             
                 m = self.get_module(mt, mod[:-3], md)
-                m = m.UnicornModule(sender)
+                m = m.UnicornModule(unicorn)
             
                 modules[m.name] = m
         return modules
@@ -74,8 +74,8 @@ class UniCat:
         self.helper.show_commands(universal_commands, target_commands)
 
     def shell(self):
-        username = sender.send_command("username")
-        hostname = sender.send_command("hostname")
+        username = unicorn.send_command("username")
+        hostname = unicorn.send_command("hostname")
         while True:
             try:
                 command = str(input("({}{}@{}{})> ".format(self.badges.GREEN, username, hostname, self.badges.RESET)))
@@ -88,7 +88,7 @@ class UniCat:
                     self.help()
                 elif command[0] == "exit":
                     print(self.badges.G + "Cleaning up...")
-                    unicorn.send("exit".encode("UTF-8"))
+                    unicorn.send_command("exit")
                     c.close()
                     s.close()
                     sys.exit()
@@ -129,7 +129,7 @@ class UniCat:
                 print(self.badges.E +"An error occurred: "+str(e)+"!")
 
     def server(self, LHOST, LPORT, handler=handler):
-        global s, a, c, sender, target_system
+        global s, a, c, unicorn, target_system
     
         print(self.badges.G + "Binding to " + LHOST + ":" + str(LPORT) + "...")
         try:
@@ -173,7 +173,7 @@ class UniCat:
             print(self.badges.G + "Establishing connection...")
             c, a = s.accept()
 
-            sender = sender(handler(c))
+            unicorn = unicorn(handler(c))
             self.load_modules()
             self.shell()
         except (KeyboardInterrupt, EOFError):

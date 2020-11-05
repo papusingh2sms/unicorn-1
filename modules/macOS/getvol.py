@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
         
         self.name = "getvol"
@@ -15,4 +15,4 @@ class UnicornModule:
         
     def run(self, cmd_data):
         payload = "output volume of (get volume settings)"
-        print(self.badges.I + "Current output sound volume: " + self.sender.send_command("osascript", payload))
+        print(self.badges.I + "Current output sound volume: " + self.unicorn.send_command("osascript", payload))

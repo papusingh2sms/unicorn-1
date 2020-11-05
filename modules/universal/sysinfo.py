@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "sysinfo"
@@ -14,4 +14,4 @@ class UnicornModule:
         self.args = 1
 
     def run(self, cmd_data):
-        print(self.sender.send_command(self.name))
+        print(self.unicorn.send_command(self.name))

@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
 
         self.name = "openurl"
@@ -17,4 +17,4 @@ class UnicornModule:
         if not cmd_data.startswith(("http://", "https://")):
             cmd_data = "http://" + cmd_data
 
-        self.sender.send_command(self.name, cmd_data, False)
+        self.unicorn.send_command(self.name, cmd_data, False)

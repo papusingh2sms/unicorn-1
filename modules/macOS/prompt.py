@@ -3,8 +3,8 @@
 from core.badges import badges
 
 class UnicornModule:
-    def __init__(self, sender):
-        self.sender = sender
+    def __init__(self, unicorn):
+        self.unicorn = unicorn
         self.badges = badges()
         
         self.name = "prompt"
@@ -34,4 +34,4 @@ class UnicornModule:
             end try
         end tell
         """
-        print(self.badges.I + "User entered: " + self.sender.send_command("osascript", payload))
+        print(self.badges.I + "User entered: " + self.unicorn.send_command("osascript", payload))
