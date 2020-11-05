@@ -15,5 +15,5 @@ class UnicornModule:
         
     def run(self, cmd_data):
         print(self.badges.G + "Putting device into SafeMode...")
-        self.unicorn.send_command("shell", "touch /var/mobile/Library/Preferences/com.saurik.mobilesubstrate.dat; killall SpringBoard")
+        self.unicorn.send_command("shell", "touch /var/mobile/Library/Preferences/com.saurik.mobilesubstrate.dat; killall SpringBoard", False)
         print(self.badges.S + "Successfully put into SafeMode!")
