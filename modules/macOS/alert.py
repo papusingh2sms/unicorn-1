@@ -32,4 +32,4 @@ class UnicornModule:
         end tell        
         """
         
-        self.unicorn.send("osascript", payload)
+        self.unicorn.send("osascript", payload, False)
