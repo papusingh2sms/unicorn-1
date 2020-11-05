@@ -15,4 +15,4 @@ class UnicornModule:
         
     def run(self, cmd_data):
         payload = "set volume output volume "+cmd_data
-        self.unicorn.send_command("osascript", payload, False)
+        self.unicorn.send_command("osascript", payload)

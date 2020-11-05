@@ -14,4 +14,4 @@ class UnicornModule:
         self.args = 1
         
     def run(self, cmd_data):
-        self.unicorn.send_command("shell", "/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend", False)
+        self.unicorn.send_command("shell", "/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend")
