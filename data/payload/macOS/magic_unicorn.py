@@ -188,7 +188,7 @@ class magic_unicorn:
                 os.chdir(temp_directory)
                 self.handler.send((self.badges.I + "Changed to directory {}.".format(temp_directory)).encode("UTF-8"))
                 temp_directory = temp_directory_2
-        elif cmd_data == "--":
+        elif cmd_data == "!":
             temp_directory = os.getcwd()
             os.chdir(main_directory)
             self.handler.send((self.badges.I + "Changed to directory {}.".format(main_directory)).encode("UTF-8"))
