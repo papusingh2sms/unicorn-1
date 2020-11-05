@@ -1,24 +1,14 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-
-try:
-    from msvcrt import getch
-except ImportError:
-    def getch():
-        import sys, tty, termios
-        fd = sys.stdin.fileno()
-        old = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            return sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+from core.keyboard import keyboard
 
 class MagicUnicorn:
     def __init__(self, unicorn):
         self.unicorn = unicorn
         self.badges = badges()
+        
+        self.keyboard = keyboard()
         
         self.name = "keyboard"
         self.description = "Control targets keyboard."
@@ -30,13 +20,8 @@ class MagicUnicorn:
         print(self.badges.G + "Connecting to keyboard...")
         print(self.badges.I + "Press Ctrl-C to stop.")
         while True:
-            key = getch()
+            key = self.keyboard.get_chr()
             if key != chr(03):
-                payload = """
-                tell application "System Events"
-                    keystroke \""""+key+"""\"
-                end tell
-                """
-                self.unicorn.send_command("osascript", payload, False)
+                self.unicorn.send_command("osascript", self.keyboard.send_chr(key), False)
             else:
                 return
