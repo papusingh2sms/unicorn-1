@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class keyboard:
     def __init__(self):
         self.keyboard_init = 1
