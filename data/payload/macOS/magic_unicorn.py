@@ -233,6 +233,7 @@ class magic_unicorn:
                     self.execute_osascript(command[1])
                 else:
                     pass
+                self.handler.send("noreply".encode("UTF-8"))
         sys.exit()
 
 
