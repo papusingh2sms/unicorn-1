@@ -15,4 +15,5 @@ class UnicornModule:
         self.args = 1
         
     def run(self, cmd_data):
-        pass
+        payload = "tell application \"Finder\" to sleep"
+        self.sender.send_command("osascript", payload, False)
