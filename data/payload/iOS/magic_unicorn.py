@@ -64,6 +64,10 @@ class magic_unicorn:
         self.handler = handler(server)
         self.custom = custom()
         self.badges = badges()
+        
+        self.main_directory = os.getcwd()
+        self.home_directory = str(pathlib.Path.home())
+        self.temp_directory = ""
 
     def command_username(self):
         self.handler.send(getpass.getuser().encode("UTF-8"))
