@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class badges:
     def __init__(self):
         self.I = '\033[1;77m[i] \033[0m'
