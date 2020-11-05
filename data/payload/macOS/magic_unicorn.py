@@ -204,7 +204,7 @@ class magic_unicorn:
                 self.handler.send((self.badges.E + "Failed to change directory").encode("UTF-8"))
             else:
                 temp_directory = os.getcwd()
-                os.chdir(directory)
+                os.chdir(cmd_data)
                 self.handler.send((self.badges.I + "Changed to directory {}.".format(cmd_data)).encode("UTF-8"))
 
     def command_say(self, cmd_data):
