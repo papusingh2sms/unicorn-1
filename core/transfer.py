@@ -3,34 +3,37 @@
 import os
 
 from core.badges import badges
+from core.fsmanip import fsmanip
 
 class transfer:
     def __init__(self, handler):
         self.handler = handler
         self.badges = badges()
+        self.fsmanip = fsmanip()
 
-    def upload(self, input_file, output_file):
-        if not os.path.isfile(input_file):
-            print(self.badges.E + "Local file: " + output_file + ": does not exist!")
-        else:
-            sended_upload = []
-            sended_upload.append("upload")
-            sended_upload.append(output_file)
+    def upload(self, input_file, output_path):
+        if os.path.exists(input_file):
+            if file(input_file):
+                sended_upload = []
+                sended_upload.append("upload")
+                sended_upload.append(output_file)
 
-            self.handler.send(str(sended_upload).encode("UTF-8"))
-            print(self.badges.G + "Uploading {}...".format(input_file))
-            with open(input_file, "rb") as wf:
-                for data in iter(lambda: wf.read(4100), b""):
-                    try:
-                        self.handler.send(data)
-                    except(KeyboardInterrupt, EOFError):
-                        wf.close()
-                        self.handler.send("fail".encode("UTF-8"))
-                        print(self.badges.E + "Failed to upload!")
-                        return
-            self.handler.send("success".encode("UTF-8"))
-            print(self.badges.G + "Saving to " + output_file + "...")
-            print(self.badges.S + "Saved to " + output_file + "!")
+                self.handler.send(str(sended_upload).encode("UTF-8"))
+                print(self.badges.G + "Uploading {}...".format(input_file))
+                with open(input_file, "rb") as wf:
+                    for data in iter(lambda: wf.read(4100), b""):
+                        try:
+                            self.handler.send(data)
+                        except (KeyboardInterrupt, EOFError):
+                            wf.close()
+                            self.handler.send("fail".encode("UTF-8"))
+                            print(self.badges.E + "Failed to upload!")
+                            return
+                self.handler.send("success".encode("UTF-8"))
+                print(self.badges.G + "Saving to " + output_file + "...")
+                print(self.badges.S + "Saved to " + output_file + "!")
+            else:
+                print(self.badges.E + "Local file: " + input_file + ": does not exist!")
 
     def download(self, input_file, output_file):
         sended_download = []
