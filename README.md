@@ -30,7 +30,7 @@
 # About Unicorn Framework
 
     Unicorn Framework is an iOS, macOS and Linux post-exploitation framework that using one line 
-    command and powerful python payload attempts to spawn interactive shell connection with a lot 
+    command and powerful python payload attempts to spawn interactive command line session with a lot 
     of features such as downloading files, uploading files, getting system information and etc.
 
 ***
