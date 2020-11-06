@@ -8,7 +8,7 @@ class UnicornModule:
         self.badges = badges()
 
         self.name = "shell"
-        self.description = "Execute remote shell command."
+        self.description = "Execute device shell command."
         self.usage = "Usage: shell <command>"
         self.type = "managing"
         self.args = 2
