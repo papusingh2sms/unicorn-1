@@ -13,7 +13,7 @@ class transfer:
 
     def upload(self, input_file, output_path):
         if os.path.exists(input_file):
-            if file(input_file):
+            if self.fsmanip.file(input_file):
                 sended_upload = []
                 sended_upload.append("upload")
                 sended_upload.append(output_file)
