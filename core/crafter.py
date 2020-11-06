@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
+from core.badges import badges
+
 class crafter:
     def __init__(self):
+        self.badges = badges()
+        
         self.payload_name = ".magic_unicorn"
         self.payload_path = "/tmp/" + self.payload_name
         self.target_systems = ["Linux", "macOS", "iOS"]
