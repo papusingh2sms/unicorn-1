@@ -20,7 +20,7 @@ class UnicornModule:
     def run(self, cmd_data):
         input_file = cmd_data.split(" ")[0]
         if os.path.exists(input_file):
-            if file(input_file):
+            if self.fsmanip.file(input_file):
                 files = input_file + " " + input_file
                 arguments = "".join(cmd_data.split(input_file)).strip()
                 print(self.badges.G + "Sending payload...")
