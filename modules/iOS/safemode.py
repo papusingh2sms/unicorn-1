@@ -8,7 +8,7 @@ class UnicornModule:
         self.badges = badges()
         
         self.name = "safemode"
-        self.description = "Put device into SafeMode."
+        self.description = "Put device into safe mode."
         self.usage = "Usage: safemode"
         self.type = "boot"
         self.args = 1
