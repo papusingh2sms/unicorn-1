@@ -9,7 +9,7 @@ class UnicornModule:
 
         self.name = "download"
         self.description = "Download remote file."
-        self.usage = "Usage: download <input_file> <output_path>"
+        self.usage = "Usage: download <remote_file> <local_path>"
         self.type = "stealing"
         self.args = 3
 
