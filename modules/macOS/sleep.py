@@ -8,7 +8,7 @@ class UnicornModule:
         self.badges = badges()
         
         self.name = "sleep"
-        self.description = "Put device into SleepMode."
+        self.description = "Put device into sleep mode."
         self.usage = "Usage: sleep"
         self.type = "boot"
         self.args = 1
