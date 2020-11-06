@@ -84,8 +84,8 @@ def banner():
     print("")
     print("Unicorn Framework "+helper.version)
     print("----------------------")
-    print("")
-    print(helper.random_message())
+    #print("")
+    #print(helper.random_message())
     print("")
 
 def main():
