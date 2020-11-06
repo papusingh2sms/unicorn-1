@@ -9,7 +9,7 @@ class UnicornModule:
 
         self.name = "upload"
         self.description = "Upload local file."
-        self.usage = "Usage: download <input_file> <output_path>"
+        self.usage = "Usage: upload <local_file> <remote_path>"
         self.type = "managing"
         self.args = 3
 
