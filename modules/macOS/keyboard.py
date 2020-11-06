@@ -11,7 +11,7 @@ class UnicornModule:
         self.keyboard = keyboard()
         
         self.name = "keyboard"
-        self.description = "Control targets keyboard."
+        self.description = "Control device keyboard."
         self.usage = "Usage: keyboard"
         self.type = "managing"
         self.args = 1
