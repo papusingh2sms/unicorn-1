@@ -324,6 +324,8 @@ class magic_unicorn:
                     self.command_load(command[1])
                 elif command[0] == "openurl":
                     self.command_openurl(command[1])
+                elif command[0] == "lsdir":
+                    self.command_lsdir(command[1])
                 elif command[0] == "chdir":
                     self.command_chdir(command[1])
                 elif command[0] == "say":
