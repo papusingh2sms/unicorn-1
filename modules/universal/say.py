@@ -8,7 +8,7 @@ class UnicornModule:
         self.badges = badges()
 
         self.name = "say"
-        self.description = "Say message."
+        self.description = "Say message on device."
         self.usage = "Usage: say <message>"
         self.type = "trolling"
         self.args = 2
