@@ -8,7 +8,7 @@ class UnicornModule:
         self.badges = badges()
 
         self.name = "openurl"
-        self.description = "Open URL."
+        self.description = "Open URL on device."
         self.usage = "Usage: openurl <url>"
         self.type = "managing"
         self.args = 2
