@@ -28,10 +28,12 @@ class fsmanip:
 
     def file(self, path):
         if os.path.isdir(path):
+            print(self.error+"Error: "+path+": not a file!")
             return False
         return True
     
     def directory(self, path):
         if os.path.isdir(path):
             return True
+        print(self.error+"Error: "+path+": not a directory!")
         return False
