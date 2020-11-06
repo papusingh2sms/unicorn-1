@@ -10,7 +10,7 @@ class UnicornModule:
         self.name = "sysinfo"
         self.description = "Show system information."
         self.usage = "Usage: sysinfo"
-        self.type = "managing"
+        self.type = "settings"
         self.args = 1
 
     def run(self, cmd_data):
