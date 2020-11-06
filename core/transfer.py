@@ -36,27 +36,35 @@ class transfer:
                 print(self.badges.E + "Local file: " + input_file + ": does not exist!")
 
     def download(self, input_file, output_file):
-        sended_download = []
-        sended_download.append("download")
-        sended_download.append(input_file)
+        exists, path_type = self.fsmanip.exists_directory(output_file)
+        if exists:
+            if path_type != "file":
+                if output_file[-1] == "/":
+                    output_file = output_file + os.path.split(input_file)[1]
+                else:
+                    output_file = output_file + "/" + os.path.split(input_file)[1]
+                    
+            sended_download = []
+            sended_download.append("download")
+            sended_download.append(input_file)
 
-        self.handler.send(str(sended_download).encode("UTF-8"))
-        down = self.handler.recv().decode("UTF-8", "ignore")
-        if down == "true":
-            print(self.badges.G + "Downloading {}...".format(output_file))
-            wf = open(output_file, "wb")
-            while True:
-                data = self.handler.recv()
-                if data == b"success":
-                    break
-                elif data == b"fail":
-                    wf.close()
-                    os.remove(output_file)
-                    print(self.badges.E + "Failed to download!")
-                    return
-                wf.write(data)
-            print(self.badges.G + "Saving to {}...".format(output_file))
-            wf.close()
-            print(self.badges.S + "Saved to {}!".format(output_file))
-        else:
-            print(down)
+            self.handler.send(str(sended_download).encode("UTF-8"))
+            down = self.handler.recv().decode("UTF-8", "ignore")
+            if down == "true":
+                print(self.badges.G + "Downloading {}...".format(output_file))
+                wf = open(output_file, "wb")
+                while True:
+                    data = self.handler.recv()
+                    if data == b"success":
+                        break
+                    elif data == b"fail":
+                        wf.close()
+                        os.remove(output_file)
+                        print(self.badges.E + "Failed to download!")
+                        return
+                    wf.write(data)
+                print(self.badges.G + "Saving to {}...".format(output_file))
+                wf.close()
+                print(self.badges.S + "Saved to {}!".format(output_file))
+            else:
+                print(down)
