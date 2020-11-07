@@ -49,8 +49,7 @@ class fsmanip:
             if os.path.exists(path):
                 return (True, "directory")
             else:
-                print(self.error+"Local directory: "+path+": does not exist!")
-                return (False, "")
+                return (False, self.error+"Remote directory: "+path+": does not exist!")
         else:
             directory = os.path.split(path)[0]
             if directory == "":
@@ -59,23 +58,18 @@ class fsmanip:
                 if os.path.isdir(directory):
                     return (True, "file")
                 else:
-                    print(self.error+"Error: "+directory+": not a directory!")
-                    return (False, "")
+                    return (False, self.error+"Error: "+directory+": not a directory!")
             else:
-                print(self.error+"Local directory: "+directory+": does not exist!")
-                return (False, "")
-
+                return (False, self.error+"Remote directory: "+directory+": does not exist!")
+            
     def file(self, path):
-        if os.path.isdir(path):
-            print(self.error+"Error: "+path+": not a file!")
-            return False
-        return True
-    
-    def directory(self, path):
-        if os.path.isdir(path):
-            return True
-        print(self.error+"Error: "+path+": not a directory!")
-        return False
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                return (False, self.error+"Error: "+path+": not a file!")
+            else:
+                return (True, None)
+        else:
+            return (False, self.error+"Remote file: "+path+": does not exist!")
     
 class custom:
     def __init__(self):
@@ -106,6 +100,7 @@ class magic_unicorn:
         self.handler = handler(server)
         self.custom = custom()
         self.badges = badges()
+        self.fsmanip = fsmanip()
         
         self.main_directory = os.getcwd()
         self.home_directory = str(pathlib.Path.home())
@@ -177,39 +172,45 @@ class magic_unicorn:
                     return
 
     def command_download(self, cmd_data):
-        if not cmd_data.strip():
-            pass
-        else:
-            output_filename = cmd_data.split("/")[-1] if "/" in cmd_data else cmd_data.split("\\")[-1] if "\\" in cmd_data else cmd_data
-            wf = open(output_filename, "wb")
-            while True:
-                data = self.handler.recv()
-                if data == b"success":
-                    break
-                elif data == b"fail":
-                    wf.close()
-                    os.remove(output_filename)
-                    return
-                wf.write(data)
-            wf.close()
+        output_filename = os.path.split(cmd_data.split(" ")[0])[1]
+        output_directory = cmd_data.split(" ")[1]
+        exists, path_type = self.fsmanip.exists_directory(output_directory):
+            if exists:
+                if path_type != "file":
+                    if output_directory[-1] == "/":
+                        output_directory = output_directory + output_filename
+                    else:
+                        output_directory =  + "/" + output_filename
+                            
+                wf = open(output_directory, "wb")
+                while True:
+                    data = self.handler.recv()
+                    if data == b"success":
+                        break
+                    elif data == b"fail":
+                        wf.close()
+                        os.remove(output_directory)
+                        return
+                    wf.write(data)
+                wf.close()
+            else:
+                self.handler.send(path_type.encode("UTF-8"))
 
     def command_upload(self, cmd_data):
-        if not cmd_data.strip():
-            pass
+        exists, error = self.fsmanip.file(cmd_data)
+        if exists:
+            self.handler.send("true".encode("UTF-8"))
+            with open(cmd_data, "rb") as wf:
+                for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
+                    try:
+                        self.handler.send(data)
+                    except (KeyboardInterrupt, EOFError):
+                        wf.close()
+                        self.handler.send("fail".encode("UTF-8"))
+                        return
+            self.handler.send("success".encode("UTF-8"))
         else:
-            if not os.path.isfile(cmd_data):
-                self.handler.send((self.badges.E + "Remote file: {}: does not exist!".format(cmd_data)).encode("UTF-8"))
-            else:
-                self.handler.send("true".encode("UTF-8"))
-                with open(cmd_data, "rb") as wf:
-                    for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
-                        try:
-                            self.handler.send(data)
-                        except(KeyboardInterrupt, EOFError):
-                            wf.close()
-                            self.handler.send("fail".encode("UTF-8"))
-                            return
-                self.handler.send("success".encode("UTF-8"))
+            self.handler.send(error.encode("UTF-8"))
 
     def command_load(self, cmd_data):
         self.handler.send(bytes(self.custom.execute(cmd_data).strip()))
