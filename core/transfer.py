@@ -15,6 +15,7 @@ class transfer:
         if self.fsmanip.file(input_file):
             sended_upload = []
             sended_upload.append("upload")
+            sended_upload.append(input_file)
             sended_upload.append(output_path)
 
             self.handler.send(str(sended_upload).encode("UTF-8"))
