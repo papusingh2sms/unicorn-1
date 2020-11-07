@@ -251,10 +251,7 @@ class magic_unicorn:
                 groups.append(grp.getgrgid(os.stat(cmd_data + i).st_gid)[0])
                 sizes.append(str(os.stat(cmd_data + i).st_size))
                 dates.append(time.ctime(os.path.getmtime(cmd_data + i)))
-                if os.path.isdir(cmd_data + i):
-                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[1].split("\n")[1])
-                else:
-                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[0])
+                modes.append(os.popen("stat " + cmd_data + i).read().split(" ")[2])
             bigger_owner = len(owners[0])
             bigger_group = len(groups[0])
             bigger_size = len(sizes[0])
