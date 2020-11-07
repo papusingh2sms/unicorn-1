@@ -241,7 +241,6 @@ class magic_unicorn:
             for i in sorted(os.listdir(cmd_data)):
                 names.append(i)
             directory_contents = ""
-            directory_contents += "\n"
             directory_contents += "\nListing: " + cmd_data[:-1] + "\n"
             directory_contents += "=" * len("Listing: " + cmd_data[:-1]) + "\n"
             directory_contents += "\n"
@@ -296,7 +295,6 @@ class magic_unicorn:
             directory_contents += "-----"+" "*(bigger_mode_len)+"-----"+" "*(bigger_owner_len)+"-----"+" "*(bigger_group_len)+"----"+" "*(bigger_size_len)+"-------------"+" "*(bigger_date_len)+"----\n"
             for i in range(0, len(names)):
                 directory_contents += modes[i] + " " * (5 - len(modes[i]) + bigger_mode_len) + owners[i] + " " * (5 - len(owners[i]) + bigger_owner_len) + groups[i] + " " * (5 - len(groups[i]) + bigger_group_len) + sizes[i] + " " * (4 - len(sizes[i]) + bigger_size_len) + dates[i] + " " * (13 - len(dates[i]) + bigger_date_len) + names[i] + "\n"
-            directory_contents += "\n\n"
             self.handler.send(directory_contents.encode("UTF-8"))
         else:
             self.handler.send((self.badges.E + "Error: " + cmd_data[:-1] + ": not a directory!").encode("UTF-8"))
