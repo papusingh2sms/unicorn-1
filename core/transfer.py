@@ -33,8 +33,7 @@ class transfer:
                             print(self.badges.E + "Failed to upload!")
                             return
                 self.handler.send("success".encode("UTF-8"))
-                print(self.badges.G + "Saving to " + output_path + "...")
-                print(self.badges.S + "Saved to " + output_path + "!")
+                print(self.handler.recv().strip().decode("UTF-8", "ignore"))
             else:
                 print(error.strip().decode("UTF-8"))
 
