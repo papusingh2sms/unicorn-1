@@ -11,7 +11,6 @@ from datetime import datetime
 from core.handler import handler
 from core.badges import badges
 from core.helper import helper
-from core.unicorn import unicorn
 from core.crafter import crafter
 
 class UniCat:
@@ -155,8 +154,9 @@ class UniCat:
             print(self.badges.G + "Establishing connection...")
             c, a = s.accept()
 
-            unicorn = None
+            from core.unicorn import unicorn
             unicorn = unicorn(handler(c))
+            
             self.load_modules()
             self.shell()
         except (KeyboardInterrupt, EOFError):
