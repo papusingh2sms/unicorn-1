@@ -18,6 +18,7 @@ from core.unicat import UniCat
 from core.helper import helper
 
 badges = badges()
+unicat = UniCat()
 helper = helper()
 
 class MyCompleter(object):
@@ -86,7 +87,6 @@ def banner():
     print("")
 
 def main():
-    unicat = UniCat()
     lport = str(helper.lport)
     lhost = str(helper.lhost)
     try:
