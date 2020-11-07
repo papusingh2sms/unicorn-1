@@ -175,31 +175,32 @@ class magic_unicorn:
         output_filename = os.path.split(cmd_data.split(" ")[0])[1]
         output_directory = cmd_data.split(" ")[1]
         exists, path_type = self.fsmanip.exists_directory(output_directory):
-            if exists:
-                if path_type != "file":
-                    if output_directory[-1] == "/":
-                        output_directory = output_directory + output_filename
-                    else:
-                        output_directory =  + "/" + output_filename
+        if exists:
+            self.handler.send("success".encode("UTF-8"))
+            if path_type != "file":
+                if output_directory[-1] == "/":
+                    output_directory = output_directory + output_filename
+                else:
+                    output_directory =  + "/" + output_filename
                             
-                wf = open(output_directory, "wb")
-                while True:
-                    data = self.handler.recv()
-                    if data == b"success":
-                        break
-                    elif data == b"fail":
-                        wf.close()
-                        os.remove(output_directory)
-                        return
-                    wf.write(data)
-                wf.close()
-            else:
-                self.handler.send(path_type.encode("UTF-8"))
+            wf = open(output_directory, "wb")
+            while True:
+                data = self.handler.recv()
+                if data == b"success":
+                    break
+                elif data == b"fail":
+                    wf.close()
+                    os.remove(output_directory)
+                    return
+                wf.write(data)
+            wf.close()
+        else:
+            self.handler.send(path_type.encode("UTF-8"))
 
     def command_upload(self, cmd_data):
         exists, error = self.fsmanip.file(cmd_data)
         if exists:
-            self.handler.send("true".encode("UTF-8"))
+            self.handler.send("success".encode("UTF-8"))
             with open(cmd_data, "rb") as wf:
                 for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
                     try:
