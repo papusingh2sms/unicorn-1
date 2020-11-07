@@ -12,13 +12,16 @@ class transfer:
         self.fsmanip = fsmanip()
 
     def upload(self, input_file, output_path):
-        if os.path.exists(input_file):
-            if self.fsmanip.file(input_file):
-                sended_upload = []
-                sended_upload.append("upload")
-                sended_upload.append(output_path)
+        if self.fsmanip.file(input_file):
+            files = input_file + " " + output_path
+            
+            sended_upload = []
+            sended_upload.append("upload")
+            sended_upload.append(files)
 
-                self.handler.send(str(sended_upload).encode("UTF-8"))
+            self.handler.send(str(sended_upload).encode("UTF-8"))
+            error = self.handler.recv()
+            if error == b"success":
                 print(self.badges.G + "Uploading {}...".format(input_file))
                 with open(input_file, "rb") as wf:
                     for data in iter(lambda: wf.read(4100), b""):
@@ -30,10 +33,9 @@ class transfer:
                             print(self.badges.E + "Failed to upload!")
                             return
                 self.handler.send("success".encode("UTF-8"))
-                print(self.badges.G + "Saving to " + output_path + "...")
-                print(self.badges.S + "Saved to " + output_path + "!")
+                print(self.handler.recv().strip().decode("UTF-8", "ignore"))
             else:
-                print(self.badges.E + "Local file: " + input_file + ": does not exist!")
+                print(error.strip().decode("UTF-8"))
 
     def download(self, input_file, output_path):
         exists, path_type = self.fsmanip.exists_directory(output_path)
@@ -49,8 +51,8 @@ class transfer:
             sended_download.append(input_file)
 
             self.handler.send(str(sended_download).encode("UTF-8"))
-            down = self.handler.recv().decode("UTF-8", "ignore")
-            if down == "true":
+            error = self.handler.recv()
+            if error == b"success":
                 print(self.badges.G + "Downloading {}...".format(input_file))
                 wf = open(output_path, "wb")
                 while True:
@@ -67,4 +69,4 @@ class transfer:
                 wf.close()
                 print(self.badges.S + "Saved to {}!".format(output_path))
             else:
-                print(down)
+                print(error.strip().decode("UTF-8", "ignore"))

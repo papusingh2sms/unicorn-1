@@ -14,7 +14,9 @@ class UnicornModule:
         self.args = 1
 
     def run(self, cmd_data):
+        print("")
         if cmd_data == "":
             print(self.unicorn.send_command(self.name, "."))
         else:
             print(self.unicorn.send_command(self.name, cmd_data))
+        print("")
