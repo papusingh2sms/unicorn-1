@@ -13,10 +13,11 @@ class transfer:
 
     def upload(self, input_file, output_path):
         if self.fsmanip.file(input_file):
+            files = input_file + " " + output_path
+            
             sended_upload = []
             sended_upload.append("upload")
-            sended_upload.append(input_file)
-            sended_upload.append(output_path)
+            sended_upload.append(files)
 
             self.handler.send(str(sended_upload).encode("UTF-8"))
             error = self.handler.recv()
