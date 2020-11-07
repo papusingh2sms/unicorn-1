@@ -155,6 +155,7 @@ class UniCat:
             print(self.badges.G + "Establishing connection...")
             c, a = s.accept()
 
+            unicorn = None
             unicorn = unicorn(handler(c))
             self.load_modules()
             self.shell()
