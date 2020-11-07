@@ -8,8 +8,6 @@ import sys
 import platform
 import getpass
 import pathlib
-import pwd
-import grp
 import time
 import datetime
 
@@ -242,9 +240,9 @@ class magic_unicorn:
             dates = []
             modes = []
             for i in names:
-                owners.append(pwd.getpwuid(os.stat(cmd_data + i).st_uid)[0])
-                groups.append(grp.getgrgid(os.stat(cmd_data + i).st_gid)[0])
-                sizes.append(str(os.stat(cmd_data + i).st_size))
+                owners.append(pathlib.Path(cmd_data + i).owner())
+                groups.append(pathlib.Path(cmd_data + i).group())
+                sizes.append(str(os.path.getsize(cmd_data + i)))
                 dates.append(time.ctime(os.path.getmtime(cmd_data + i)))
                 modes.append(os.popen("stat '" + cmd_data + i + "'").read().split(" ")[2])
             bigger_owner = len(owners[0])
