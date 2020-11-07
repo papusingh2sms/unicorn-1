@@ -50,8 +50,7 @@ class fsmanip:
             if os.path.exists(path):
                 return (True, "directory")
             else:
-                print(self.error+"Local directory: "+path+": does not exist!")
-                return (False, "")
+                return (False, self.error+"Remote directory: "+path+": does not exist!")
         else:
             directory = os.path.split(path)[0]
             if directory == "":
@@ -60,23 +59,18 @@ class fsmanip:
                 if os.path.isdir(directory):
                     return (True, "file")
                 else:
-                    print(self.error+"Error: "+directory+": not a directory!")
-                    return (False, "")
+                    return (False, self.error+"Error: "+directory+": not a directory!")
             else:
-                print(self.error+"Local directory: "+directory+": does not exist!")
-                return (False, "")
-
+                return (False, self.error+"Remote directory: "+directory+": does not exist!")
+            
     def file(self, path):
-        if os.path.isdir(path):
-            print(self.error+"Error: "+path+": not a file!")
-            return False
-        return True
-    
-    def directory(self, path):
-        if os.path.isdir(path):
-            return True
-        print(self.error+"Error: "+path+": not a directory!")
-        return False 
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                return (False, self.error+"Error: "+path+": not a file!")
+            else:
+                return (True, None)
+        else:
+            return (False, self.error+"Remote file: "+path+": does not exist!")
    
 class custom:
     def __init__(self):
