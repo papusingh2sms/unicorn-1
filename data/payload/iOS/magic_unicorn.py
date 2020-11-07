@@ -186,6 +186,10 @@ class magic_unicorn:
             while True:
                 data = self.handler.recv()
                 if data == b"success":
+                    result = ""
+                    result += f"{self.badges.G}Saving to {output_directory}...\n"
+                    result += f"{self.badges.S}Saved to {output_directory}!"
+                    self.handler.send(result.encode("UTF-8"))
                     break
                 elif data == b"fail":
                     wf.close()
