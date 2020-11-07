@@ -188,7 +188,7 @@ class magic_unicorn:
                 if output_directory[-1] == "/":
                     output_directory = output_directory + output_filename
                 else:
-                    output_directory =  + "/" + output_filename
+                    output_directory = output_directory + "/" + output_filename
                             
             wf = open(output_directory, "wb")
             while True:
