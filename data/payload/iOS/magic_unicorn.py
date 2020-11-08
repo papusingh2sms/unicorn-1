@@ -237,10 +237,10 @@ class magic_unicorn:
                     directory = cmd_data[:-1]
             else:
                 if cmd_data[-1] != "/":
-                    directory = os.getcwd() + "/" + cmd_data
+                    directory = os.path.abspath(cmd_data)
                     cmd_data = cmd_data + "/"
                 else:
-                    directory = os.getcwd() + "/" + cmd_data[:-1]
+                    directory = os.path.abspath(cmd_data[:-1])
                 
             directory_contents += "\nListing: " + directory + "\n"
             directory_contents += "=" * len("Listing: " + directory) + "\n"
