@@ -17,4 +17,12 @@ class UnicornModule:
         self.args = 1
         
     def run(self, cmd_data):
-        pass
+        if cmd_data == "read":
+            print(self.unicorn.send_command("shell", "pbpaste"))
+        else if cmd_data == "write":
+            if len(cmd_data.split(" ")) < 2:
+                print(self.usage)
+            else:
+                self.unicorn.send_command("shell", "echo \""+cmd_data.split("write")[1].strip()+"\" | pbcopy", False)
+        else:
+            print(self.usage)
