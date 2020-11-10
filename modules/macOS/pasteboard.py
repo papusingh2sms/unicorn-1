@@ -14,7 +14,7 @@ class UnicornModule:
         self.description = "Control device pasteboard."
         self.usage = "Usage: pasteboard [read|write <value>]"
         self.type = "managing"
-        self.args = 1
+        self.args = 2
         
     def run(self, cmd_data):
         if cmd_data == "read":
